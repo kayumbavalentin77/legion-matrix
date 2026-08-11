@@ -80,7 +80,7 @@ export function ResourcePage({
   emptyHint,
 }: {
   title: string;
-  description?: string;
+  description?: string | undefined;
   module: string;
   table: string;
   select?: string;
@@ -89,8 +89,8 @@ export function ResourcePage({
   fields: Field[];
   searchKeys: string[];
   filters?: Filter[];
-  toolbar?: ReactNode;
-  emptyHint?: string;
+  toolbar?: ReactNode | undefined;
+  emptyHint?: string | undefined;
 }) {
   const { data: rows, isLoading, error } = useRows(table, select, orderBy);
   const save = useSaveRow(table, module);
@@ -363,7 +363,7 @@ export function RecordDialog({
   fields: Field[];
   initial: Row;
   onSubmit: (values: Row) => void;
-  saving?: boolean;
+  saving?: boolean | undefined;
 }) {
   const [values, setValues] = useState<Row>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
