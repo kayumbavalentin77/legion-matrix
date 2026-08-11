@@ -10,33 +10,355 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAmmunitionRouteImport } from './routes/_authenticated/ammunition'
+import { Route as AuthenticatedCommunicationsRouteImport } from './routes/_authenticated/communications'
+import { Route as AuthenticatedCoordinatesRouteImport } from './routes/_authenticated/coordinates'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
+import { Route as AuthenticatedEquipmentRouteImport } from './routes/_authenticated/equipment'
+import { Route as AuthenticatedFitnessRouteImport } from './routes/_authenticated/fitness'
+import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
+import { Route as AuthenticatedIntelligenceFilesRouteImport } from './routes/_authenticated/intelligence-files'
+import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
+import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
+import { Route as AuthenticatedMedicalRouteImport } from './routes/_authenticated/medical'
+import { Route as AuthenticatedMissionFilesRouteImport } from './routes/_authenticated/mission-files'
+import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated/operations'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedSecurityReportsRouteImport } from './routes/_authenticated/security-reports'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSoldiersRouteImport } from './routes/_authenticated/soldiers'
+import { Route as AuthenticatedVehicleFaultsRouteImport } from './routes/_authenticated/vehicle-faults'
+import { Route as AuthenticatedVehicleMaintenanceRouteImport } from './routes/_authenticated/vehicle-maintenance'
+import { Route as AuthenticatedVehicleTrackingRouteImport } from './routes/_authenticated/vehicle-tracking'
+import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticated/vehicles'
+import { Route as AuthenticatedWeaponsRouteImport } from './routes/_authenticated/weapons'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAmmunitionRoute = AuthenticatedAmmunitionRouteImport.update({
+  id: '/ammunition',
+  path: '/ammunition',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCommunicationsRoute =
+  AuthenticatedCommunicationsRouteImport.update({
+    id: '/communications',
+    path: '/communications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCoordinatesRoute =
+  AuthenticatedCoordinatesRouteImport.update({
+    id: '/coordinates',
+    path: '/coordinates',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEquipmentRoute = AuthenticatedEquipmentRouteImport.update({
+  id: '/equipment',
+  path: '/equipment',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFitnessRoute = AuthenticatedFitnessRouteImport.update({
+  id: '/fitness',
+  path: '/fitness',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIntelligenceFilesRoute =
+  AuthenticatedIntelligenceFilesRouteImport.update({
+    id: '/intelligence-files',
+    path: '/intelligence-files',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMedicalRoute = AuthenticatedMedicalRouteImport.update({
+  id: '/medical',
+  path: '/medical',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMissionFilesRoute =
+  AuthenticatedMissionFilesRouteImport.update({
+    id: '/mission-files',
+    path: '/mission-files',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOperationsRoute = AuthenticatedOperationsRouteImport.update({
+  id: '/operations',
+  path: '/operations',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSecurityReportsRoute =
+  AuthenticatedSecurityReportsRouteImport.update({
+    id: '/security-reports',
+    path: '/security-reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSoldiersRoute = AuthenticatedSoldiersRouteImport.update({
+  id: '/soldiers',
+  path: '/soldiers',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVehicleFaultsRoute =
+  AuthenticatedVehicleFaultsRouteImport.update({
+    id: '/vehicle-faults',
+    path: '/vehicle-faults',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedVehicleMaintenanceRoute =
+  AuthenticatedVehicleMaintenanceRouteImport.update({
+    id: '/vehicle-maintenance',
+    path: '/vehicle-maintenance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedVehicleTrackingRoute =
+  AuthenticatedVehicleTrackingRouteImport.update({
+    id: '/vehicle-tracking',
+    path: '/vehicle-tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
+  id: '/vehicles',
+  path: '/vehicles',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWeaponsRoute = AuthenticatedWeaponsRouteImport.update({
+  id: '/weapons',
+  path: '/weapons',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/communications': typeof AuthenticatedCommunicationsRoute
+  '/coordinates': typeof AuthenticatedCoordinatesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/documents': typeof AuthenticatedDocumentsRoute
+  '/equipment': typeof AuthenticatedEquipmentRoute
+  '/fitness': typeof AuthenticatedFitnessRoute
+  '/help': typeof AuthenticatedHelpRoute
+  '/intelligence-files': typeof AuthenticatedIntelligenceFilesRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
+  '/map': typeof AuthenticatedMapRoute
+  '/medical': typeof AuthenticatedMedicalRoute
+  '/mission-files': typeof AuthenticatedMissionFilesRoute
+  '/operations': typeof AuthenticatedOperationsRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/security-reports': typeof AuthenticatedSecurityReportsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/soldiers': typeof AuthenticatedSoldiersRoute
+  '/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
+  '/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
+  '/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
+  '/vehicles': typeof AuthenticatedVehiclesRoute
+  '/weapons': typeof AuthenticatedWeaponsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/communications': typeof AuthenticatedCommunicationsRoute
+  '/coordinates': typeof AuthenticatedCoordinatesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/documents': typeof AuthenticatedDocumentsRoute
+  '/equipment': typeof AuthenticatedEquipmentRoute
+  '/fitness': typeof AuthenticatedFitnessRoute
+  '/help': typeof AuthenticatedHelpRoute
+  '/intelligence-files': typeof AuthenticatedIntelligenceFilesRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
+  '/map': typeof AuthenticatedMapRoute
+  '/medical': typeof AuthenticatedMedicalRoute
+  '/mission-files': typeof AuthenticatedMissionFilesRoute
+  '/operations': typeof AuthenticatedOperationsRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/security-reports': typeof AuthenticatedSecurityReportsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/soldiers': typeof AuthenticatedSoldiersRoute
+  '/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
+  '/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
+  '/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
+  '/vehicles': typeof AuthenticatedVehiclesRoute
+  '/weapons': typeof AuthenticatedWeaponsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/_authenticated/communications': typeof AuthenticatedCommunicationsRoute
+  '/_authenticated/coordinates': typeof AuthenticatedCoordinatesRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
+  '/_authenticated/equipment': typeof AuthenticatedEquipmentRoute
+  '/_authenticated/fitness': typeof AuthenticatedFitnessRoute
+  '/_authenticated/help': typeof AuthenticatedHelpRoute
+  '/_authenticated/intelligence-files': typeof AuthenticatedIntelligenceFilesRoute
+  '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
+  '/_authenticated/map': typeof AuthenticatedMapRoute
+  '/_authenticated/medical': typeof AuthenticatedMedicalRoute
+  '/_authenticated/mission-files': typeof AuthenticatedMissionFilesRoute
+  '/_authenticated/operations': typeof AuthenticatedOperationsRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/security-reports': typeof AuthenticatedSecurityReportsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/soldiers': typeof AuthenticatedSoldiersRoute
+  '/_authenticated/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
+  '/_authenticated/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
+  '/_authenticated/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
+  '/_authenticated/vehicles': typeof AuthenticatedVehiclesRoute
+  '/_authenticated/weapons': typeof AuthenticatedWeaponsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/ammunition'
+    | '/communications'
+    | '/coordinates'
+    | '/dashboard'
+    | '/documents'
+    | '/equipment'
+    | '/fitness'
+    | '/help'
+    | '/intelligence-files'
+    | '/inventory'
+    | '/map'
+    | '/medical'
+    | '/mission-files'
+    | '/operations'
+    | '/reports'
+    | '/security-reports'
+    | '/settings'
+    | '/soldiers'
+    | '/vehicle-faults'
+    | '/vehicle-maintenance'
+    | '/vehicle-tracking'
+    | '/vehicles'
+    | '/weapons'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/ammunition'
+    | '/communications'
+    | '/coordinates'
+    | '/dashboard'
+    | '/documents'
+    | '/equipment'
+    | '/fitness'
+    | '/help'
+    | '/intelligence-files'
+    | '/inventory'
+    | '/map'
+    | '/medical'
+    | '/mission-files'
+    | '/operations'
+    | '/reports'
+    | '/security-reports'
+    | '/settings'
+    | '/soldiers'
+    | '/vehicle-faults'
+    | '/vehicle-maintenance'
+    | '/vehicle-tracking'
+    | '/vehicles'
+    | '/weapons'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
+    | '/_authenticated/ammunition'
+    | '/_authenticated/communications'
+    | '/_authenticated/coordinates'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/documents'
+    | '/_authenticated/equipment'
+    | '/_authenticated/fitness'
+    | '/_authenticated/help'
+    | '/_authenticated/intelligence-files'
+    | '/_authenticated/inventory'
+    | '/_authenticated/map'
+    | '/_authenticated/medical'
+    | '/_authenticated/mission-files'
+    | '/_authenticated/operations'
+    | '/_authenticated/reports'
+    | '/_authenticated/security-reports'
+    | '/_authenticated/settings'
+    | '/_authenticated/soldiers'
+    | '/_authenticated/vehicle-faults'
+    | '/_authenticated/vehicle-maintenance'
+    | '/_authenticated/vehicle-tracking'
+    | '/_authenticated/vehicles'
+    | '/_authenticated/weapons'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +370,251 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/ammunition': {
+      id: '/_authenticated/ammunition'
+      path: '/ammunition'
+      fullPath: '/ammunition'
+      preLoaderRoute: typeof AuthenticatedAmmunitionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/communications': {
+      id: '/_authenticated/communications'
+      path: '/communications'
+      fullPath: '/communications'
+      preLoaderRoute: typeof AuthenticatedCommunicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/coordinates': {
+      id: '/_authenticated/coordinates'
+      path: '/coordinates'
+      fullPath: '/coordinates'
+      preLoaderRoute: typeof AuthenticatedCoordinatesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documents': {
+      id: '/_authenticated/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/equipment': {
+      id: '/_authenticated/equipment'
+      path: '/equipment'
+      fullPath: '/equipment'
+      preLoaderRoute: typeof AuthenticatedEquipmentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fitness': {
+      id: '/_authenticated/fitness'
+      path: '/fitness'
+      fullPath: '/fitness'
+      preLoaderRoute: typeof AuthenticatedFitnessRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/help': {
+      id: '/_authenticated/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof AuthenticatedHelpRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/intelligence-files': {
+      id: '/_authenticated/intelligence-files'
+      path: '/intelligence-files'
+      fullPath: '/intelligence-files'
+      preLoaderRoute: typeof AuthenticatedIntelligenceFilesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventory': {
+      id: '/_authenticated/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/map': {
+      id: '/_authenticated/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AuthenticatedMapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/medical': {
+      id: '/_authenticated/medical'
+      path: '/medical'
+      fullPath: '/medical'
+      preLoaderRoute: typeof AuthenticatedMedicalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mission-files': {
+      id: '/_authenticated/mission-files'
+      path: '/mission-files'
+      fullPath: '/mission-files'
+      preLoaderRoute: typeof AuthenticatedMissionFilesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/operations': {
+      id: '/_authenticated/operations'
+      path: '/operations'
+      fullPath: '/operations'
+      preLoaderRoute: typeof AuthenticatedOperationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/security-reports': {
+      id: '/_authenticated/security-reports'
+      path: '/security-reports'
+      fullPath: '/security-reports'
+      preLoaderRoute: typeof AuthenticatedSecurityReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/soldiers': {
+      id: '/_authenticated/soldiers'
+      path: '/soldiers'
+      fullPath: '/soldiers'
+      preLoaderRoute: typeof AuthenticatedSoldiersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vehicle-faults': {
+      id: '/_authenticated/vehicle-faults'
+      path: '/vehicle-faults'
+      fullPath: '/vehicle-faults'
+      preLoaderRoute: typeof AuthenticatedVehicleFaultsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vehicle-maintenance': {
+      id: '/_authenticated/vehicle-maintenance'
+      path: '/vehicle-maintenance'
+      fullPath: '/vehicle-maintenance'
+      preLoaderRoute: typeof AuthenticatedVehicleMaintenanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vehicle-tracking': {
+      id: '/_authenticated/vehicle-tracking'
+      path: '/vehicle-tracking'
+      fullPath: '/vehicle-tracking'
+      preLoaderRoute: typeof AuthenticatedVehicleTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vehicles': {
+      id: '/_authenticated/vehicles'
+      path: '/vehicles'
+      fullPath: '/vehicles'
+      preLoaderRoute: typeof AuthenticatedVehiclesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/weapons': {
+      id: '/_authenticated/weapons'
+      path: '/weapons'
+      fullPath: '/weapons'
+      preLoaderRoute: typeof AuthenticatedWeaponsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAmmunitionRoute: typeof AuthenticatedAmmunitionRoute
+  AuthenticatedCommunicationsRoute: typeof AuthenticatedCommunicationsRoute
+  AuthenticatedCoordinatesRoute: typeof AuthenticatedCoordinatesRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
+  AuthenticatedEquipmentRoute: typeof AuthenticatedEquipmentRoute
+  AuthenticatedFitnessRoute: typeof AuthenticatedFitnessRoute
+  AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
+  AuthenticatedIntelligenceFilesRoute: typeof AuthenticatedIntelligenceFilesRoute
+  AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
+  AuthenticatedMapRoute: typeof AuthenticatedMapRoute
+  AuthenticatedMedicalRoute: typeof AuthenticatedMedicalRoute
+  AuthenticatedMissionFilesRoute: typeof AuthenticatedMissionFilesRoute
+  AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedSecurityReportsRoute: typeof AuthenticatedSecurityReportsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSoldiersRoute: typeof AuthenticatedSoldiersRoute
+  AuthenticatedVehicleFaultsRoute: typeof AuthenticatedVehicleFaultsRoute
+  AuthenticatedVehicleMaintenanceRoute: typeof AuthenticatedVehicleMaintenanceRoute
+  AuthenticatedVehicleTrackingRoute: typeof AuthenticatedVehicleTrackingRoute
+  AuthenticatedVehiclesRoute: typeof AuthenticatedVehiclesRoute
+  AuthenticatedWeaponsRoute: typeof AuthenticatedWeaponsRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAmmunitionRoute: AuthenticatedAmmunitionRoute,
+  AuthenticatedCommunicationsRoute: AuthenticatedCommunicationsRoute,
+  AuthenticatedCoordinatesRoute: AuthenticatedCoordinatesRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
+  AuthenticatedEquipmentRoute: AuthenticatedEquipmentRoute,
+  AuthenticatedFitnessRoute: AuthenticatedFitnessRoute,
+  AuthenticatedHelpRoute: AuthenticatedHelpRoute,
+  AuthenticatedIntelligenceFilesRoute: AuthenticatedIntelligenceFilesRoute,
+  AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
+  AuthenticatedMapRoute: AuthenticatedMapRoute,
+  AuthenticatedMedicalRoute: AuthenticatedMedicalRoute,
+  AuthenticatedMissionFilesRoute: AuthenticatedMissionFilesRoute,
+  AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedSecurityReportsRoute: AuthenticatedSecurityReportsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSoldiersRoute: AuthenticatedSoldiersRoute,
+  AuthenticatedVehicleFaultsRoute: AuthenticatedVehicleFaultsRoute,
+  AuthenticatedVehicleMaintenanceRoute: AuthenticatedVehicleMaintenanceRoute,
+  AuthenticatedVehicleTrackingRoute: AuthenticatedVehicleTrackingRoute,
+  AuthenticatedVehiclesRoute: AuthenticatedVehiclesRoute,
+  AuthenticatedWeaponsRoute: AuthenticatedWeaponsRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
