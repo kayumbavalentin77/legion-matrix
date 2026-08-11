@@ -58,7 +58,7 @@ function CommsPage() {
         { key: "category", label: "Category", options: ["Weapons Registry", "Communication Equipment", "Protective Equipment", "Technical Equipment", "General Equipment"] },
         { key: "status", label: "Status", options: ["Available", "Issued", "Under Maintenance", "Damaged", "Lost", "Retired"] },
       ]}
-      baseFilter={{{ category: "Communication Equipment" }}}
+      baseFilter={{ category: "Communication Equipment" }}
     />
   );
 }
