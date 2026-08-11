@@ -2,6 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+// Generic table access for the shared CRUD layer (table names are dynamic).
+const db = supabase as unknown as {
+  from: (table: string) => any;
+};
+
 export type Row = Record<string, any>;
 
 export async function logAudit(action: string, module: string, recordRef?: string, description?: string) {
@@ -21,8 +26,8 @@ export function useRows(table: string, select = "*", orderBy = "created_at", asc
   return useQuery({
     queryKey: ["table", table, select, orderBy],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from(table as never)
+      const { data, error } = await db
+        .from(table)
         .select(select)
         .order(orderBy, { ascending });
       if (error) throw error;
@@ -35,15 +40,15 @@ export function useSaveRow(table: string, module: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (values: Row) => {
-      const { id, ...rest } = values;
+      const { id, ...rest } = values as { id?: string } & Row;
       if (id) {
-        const { error } = await supabase.from(table as never).update(rest).eq("id", id);
+        const { error } = await db.from(table).update(rest).eq("id", id);
         if (error) throw error;
         await logAudit("Updated", module, String(id), `Record updated in ${module}`);
       } else {
-        const { data, error } = await supabase.from(table as never).insert(rest).select("id").single();
+        const { data, error } = await db.from(table).insert(rest).select("id").single();
         if (error) throw error;
-        await logAudit("Created", module, (data as Row)?.id, `New record created in ${module}`);
+        await logAudit("Created", module, (data as Row | null)?.["id"], `New record created in ${module}`);
       }
     },
     onSuccess: () => {
@@ -59,7 +64,7 @@ export function useDeleteRow(table: string, module: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(table as never).delete().eq("id", id);
+      const { error } = await db.from(table).delete().eq("id", id);
       if (error) throw error;
       await logAudit("Deleted", module, id, `Record deleted from ${module}`);
     },
