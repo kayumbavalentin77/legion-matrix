@@ -76,6 +76,7 @@ export function ResourcePage({
   fields,
   searchKeys,
   filters = [],
+  baseFilter,
   toolbar,
   emptyHint,
 }: {
@@ -89,6 +90,7 @@ export function ResourcePage({
   fields: Field[];
   searchKeys: string[];
   filters?: Filter[];
+  baseFilter?: Record<string, string> | undefined;
   toolbar?: ReactNode | undefined;
   emptyHint?: string | undefined;
 }) {
@@ -106,6 +108,9 @@ export function ResourcePage({
 
   const filtered = useMemo(() => {
     let list = rows ?? [];
+    if (baseFilter) {
+      list = list.filter((r) => Object.entries(baseFilter).every(([k, v]) => String(r[k] ?? "") === v));
+    }
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter((r) => searchKeys.some((k) => String(r[k] ?? "").toLowerCase().includes(q)));
@@ -114,7 +119,7 @@ export function ResourcePage({
       if (value && value !== "all") list = list.filter((r) => String(r[key] ?? "") === value);
     }
     return list;
-  }, [rows, query, filterValues, searchKeys]);
+  }, [rows, query, filterValues, searchKeys, baseFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const current = Math.min(page, totalPages);
@@ -151,7 +156,7 @@ export function ResourcePage({
               <Download className="mr-1.5 h-4 w-4" /> Export CSV
             </Button>
             {canWrite ? (
-              <Button size="sm" onClick={() => setEditing({})}>
+              <Button size="sm" onClick={() => setEditing({ ...(baseFilter ?? {}) })}>
                 <Plus className="mr-1.5 h-4 w-4" /> New record
               </Button>
             ) : null}
