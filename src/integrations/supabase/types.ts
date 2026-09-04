@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -147,6 +147,7 @@ export type Database = {
           category: string | null
           classification: string
           created_at: string
+          created_by: string | null
           document_code: string
           document_date: string | null
           file_name: string | null
@@ -157,12 +158,14 @@ export type Database = {
           title: string
           unit_id: string | null
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           author?: string | null
           category?: string | null
           classification?: string
           created_at?: string
+          created_by?: string | null
           document_code: string
           document_date?: string | null
           file_name?: string | null
@@ -173,12 +176,14 @@ export type Database = {
           title: string
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           author?: string | null
           category?: string | null
           classification?: string
           created_at?: string
+          created_by?: string | null
           document_code?: string
           document_date?: string | null
           file_name?: string | null
@@ -189,6 +194,7 @@ export type Database = {
           title?: string
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -213,6 +219,7 @@ export type Database = {
           category: string
           condition: string | null
           created_at: string
+          created_by: string | null
           date_acquired: string | null
           equipment_code: string
           id: string
@@ -222,12 +229,14 @@ export type Database = {
           status: string
           unit_id: string | null
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           assigned_to?: string | null
           category: string
           condition?: string | null
           created_at?: string
+          created_by?: string | null
           date_acquired?: string | null
           equipment_code: string
           id?: string
@@ -237,12 +246,14 @@ export type Database = {
           status?: string
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           assigned_to?: string | null
           category?: string
           condition?: string | null
           created_at?: string
+          created_by?: string | null
           date_acquired?: string | null
           equipment_code?: string
           id?: string
@@ -252,6 +263,7 @@ export type Database = {
           status?: string
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -316,6 +328,186 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      gps_coordinates: {
+        Row: {
+          category: string
+          classification: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          distance_km: number | null
+          dms_latitude: string | null
+          dms_longitude: string | null
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          place_name: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string
+          classification?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          distance_km?: number | null
+          dms_latitude?: string | null
+          dms_longitude?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+          place_name?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          classification?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          distance_km?: number | null
+          dms_latitude?: string | null
+          dms_longitude?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          place_name?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      intelligence_files: {
+        Row: {
+          category: string
+          classification: string
+          created_at: string
+          created_by: string | null
+          date_of_information: string | null
+          date_of_report: string | null
+          description: string | null
+          file_name: string
+          file_path: string | null
+          file_size: number | null
+          file_type: string | null
+          id: string
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string
+          classification?: string
+          created_at?: string
+          created_by?: string | null
+          date_of_information?: string | null
+          date_of_report?: string | null
+          description?: string | null
+          file_name: string
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          classification?: string
+          created_at?: string
+          created_by?: string | null
+          date_of_information?: string | null
+          date_of_report?: string | null
+          description?: string | null
+          file_name?: string
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      intelligence_reports: {
+        Row: {
+          category: string | null
+          classification: string
+          created_at: string
+          created_by: string | null
+          date_of_information: string | null
+          id: string
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
+          reliability: string | null
+          report_code: string
+          report_date: string
+          source: string | null
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string | null
+          classification?: string
+          created_at?: string
+          created_by?: string | null
+          date_of_information?: string | null
+          id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          reliability?: string | null
+          report_code: string
+          report_date?: string
+          source?: string | null
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string | null
+          classification?: string
+          created_at?: string
+          created_by?: string | null
+          date_of_information?: string | null
+          id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          reliability?: string | null
+          report_code?: string
+          report_date?: string
+          source?: string | null
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       inventory: {
         Row: {
@@ -399,34 +591,40 @@ export type Database = {
           category: string | null
           classification: string | null
           created_at: string
+          created_by: string | null
           description: string | null
           id: string
           latitude: number
           longitude: number
           name: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           category?: string | null
           classification?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           latitude: number
           longitude: number
           name: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           category?: string | null
           classification?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           latitude?: number
           longitude?: number
           name?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -507,12 +705,74 @@ export type Database = {
         }
         Relationships: []
       }
+      operation_locations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          dms_latitude: string | null
+          dms_longitude: string | null
+          id: string
+          latitude: number
+          location_type: string | null
+          longitude: number
+          name: string
+          operation_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          dms_latitude?: string | null
+          dms_longitude?: string | null
+          id?: string
+          latitude: number
+          location_type?: string | null
+          longitude: number
+          name: string
+          operation_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          dms_latitude?: string | null
+          dms_longitude?: string | null
+          id?: string
+          latitude?: number
+          location_type?: string | null
+          longitude?: number
+          name?: string
+          operation_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_locations_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       operations: {
         Row: {
           created_at: string
+          created_by: string | null
           description: string | null
           end_date: string | null
           id: string
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
+          objective: string | null
+          operation_type: string | null
           reference_number: string
           responsible_officer: string | null
           start_date: string | null
@@ -520,12 +780,19 @@ export type Database = {
           title: string
           unit_id: string | null
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           description?: string | null
           end_date?: string | null
           id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          objective?: string | null
+          operation_type?: string | null
           reference_number: string
           responsible_officer?: string | null
           start_date?: string | null
@@ -533,12 +800,19 @@ export type Database = {
           title: string
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           description?: string | null
           end_date?: string | null
           id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          objective?: string | null
+          operation_type?: string | null
           reference_number?: string
           responsible_officer?: string | null
           start_date?: string | null
@@ -546,6 +820,7 @@ export type Database = {
           title?: string
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -565,6 +840,7 @@ export type Database = {
           full_name: string
           id: string
           last_login: string | null
+          phone: string | null
           status: string
           updated_at: string
           username: string | null
@@ -576,6 +852,7 @@ export type Database = {
           full_name?: string
           id: string
           last_login?: string | null
+          phone?: string | null
           status?: string
           updated_at?: string
           username?: string | null
@@ -587,6 +864,7 @@ export type Database = {
           full_name?: string
           id?: string
           last_login?: string | null
+          phone?: string | null
           status?: string
           updated_at?: string
           username?: string | null
@@ -597,6 +875,7 @@ export type Database = {
         Row: {
           category: string | null
           created_at: string
+          created_by: string | null
           description: string | null
           id: string
           location: string | null
@@ -607,10 +886,12 @@ export type Database = {
           source: string | null
           status: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           category?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           location?: string | null
@@ -621,10 +902,12 @@ export type Database = {
           source?: string | null
           status?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           category?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           location?: string | null
@@ -635,6 +918,7 @@ export type Database = {
           source?: string | null
           status?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -642,6 +926,7 @@ export type Database = {
         Row: {
           address: string | null
           created_at: string
+          created_by: string | null
           date_joined: string | null
           date_of_birth: string | null
           email: string | null
@@ -657,10 +942,12 @@ export type Database = {
           status: string
           unit_id: string | null
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           address?: string | null
           created_at?: string
+          created_by?: string | null
           date_joined?: string | null
           date_of_birth?: string | null
           email?: string | null
@@ -676,10 +963,12 @@ export type Database = {
           status?: string
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           address?: string | null
           created_at?: string
+          created_by?: string | null
           date_joined?: string | null
           date_of_birth?: string | null
           email?: string | null
@@ -695,6 +984,7 @@ export type Database = {
           status?: string
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -724,6 +1014,69 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: string | null
+        }
+        Relationships: []
+      }
+      threats: {
+        Row: {
+          assessed_on: string | null
+          assessment: string | null
+          category: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          impact: string | null
+          latitude: number | null
+          likelihood: string | null
+          location_name: string | null
+          longitude: number | null
+          mitigation: string | null
+          risk_level: string
+          status: string
+          threat_code: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          assessed_on?: string | null
+          assessment?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          impact?: string | null
+          latitude?: number | null
+          likelihood?: string | null
+          location_name?: string | null
+          longitude?: number | null
+          mitigation?: string | null
+          risk_level?: string
+          status?: string
+          threat_code: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          assessed_on?: string | null
+          assessment?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          impact?: string | null
+          latitude?: number | null
+          likelihood?: string | null
+          location_name?: string | null
+          longitude?: number | null
+          mitigation?: string | null
+          risk_level?: string
+          status?: string
+          threat_code?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -963,6 +1316,7 @@ export type Database = {
       vehicles: {
         Row: {
           created_at: string
+          created_by: string | null
           driver: string | null
           id: string
           manufacturer: string | null
@@ -972,11 +1326,13 @@ export type Database = {
           type: string | null
           unit_id: string | null
           updated_at: string
+          updated_by: string | null
           vehicle_code: string
           year: number | null
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           driver?: string | null
           id?: string
           manufacturer?: string | null
@@ -986,11 +1342,13 @@ export type Database = {
           type?: string | null
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
           vehicle_code: string
           year?: number | null
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           driver?: string | null
           id?: string
           manufacturer?: string | null
@@ -1000,6 +1358,7 @@ export type Database = {
           type?: string | null
           unit_id?: string | null
           updated_at?: string
+          updated_by?: string | null
           vehicle_code?: string
           year?: number | null
         }
@@ -1027,7 +1386,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_section: {
+        Args: { _section: Database["public"]["Enums"]["app_role"] }
+        Returns: boolean
+      }
       is_admin: { Args: never; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role:
@@ -1039,6 +1403,9 @@ export type Database = {
         | "vehicle_officer"
         | "equipment_officer"
         | "viewer"
+        | "s1"
+        | "s2"
+        | "s3"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1054,12 +1421,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1083,11 +1450,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1108,11 +1475,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1133,11 +1500,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1150,11 +1517,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1175,6 +1542,9 @@ export const Constants = {
         "vehicle_officer",
         "equipment_officer",
         "viewer",
+        "s1",
+        "s2",
+        "s3",
       ],
     },
   },
