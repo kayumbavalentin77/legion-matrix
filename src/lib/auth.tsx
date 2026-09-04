@@ -2,26 +2,25 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole =
-  | "super_admin"
-  | "administrator"
-  | "personnel_officer"
-  | "logistics_officer"
-  | "medical_officer"
-  | "vehicle_officer"
-  | "equipment_officer"
-  | "viewer";
+export type AppRole = "super_admin" | "s1" | "s2" | "s3" | "viewer";
 
-export const ROLE_LABELS: Record<AppRole, string> = {
+export type Section = "s1" | "s2" | "s3";
+
+export const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin",
-  administrator: "Administrator",
-  personnel_officer: "Personnel Officer",
-  logistics_officer: "Logistics Officer",
-  medical_officer: "Medical Officer",
-  vehicle_officer: "Vehicle Officer",
-  equipment_officer: "Equipment Officer",
-  viewer: "Viewer",
+  s1: "S1 · Personnel & Equipment",
+  s2: "S2 · Intelligence",
+  s3: "S3 · Operations",
+  viewer: "Unassigned",
 };
+
+export const ROLE_OPTIONS = [
+  { value: "super_admin", label: "Super Admin" },
+  { value: "s1", label: "S1 · Personnel & Equipment" },
+  { value: "s2", label: "S2 · Intelligence" },
+  { value: "s3", label: "S3 · Operations" },
+  { value: "viewer", label: "Unassigned" },
+];
 
 export function useAuthState() {
   const qc = useQueryClient();
@@ -53,16 +52,24 @@ export function useAuthState() {
   });
 
   const roles = query.data?.roles ?? [];
-  const isAdmin = roles.includes("super_admin") || roles.includes("administrator");
+  const isSuperAdmin = roles.includes("super_admin");
+  const primaryRole: AppRole = isSuperAdmin ? "super_admin" : (roles[0] ?? "viewer");
+
+  const can = (sections: Section[]) =>
+    isSuperAdmin || sections.some((s) => roles.includes(s));
 
   return {
     ...query,
     user: query.data?.user ?? null,
     profile: query.data?.profile ?? null,
     roles,
-    isAdmin,
-    canWrite: roles.some((r) => r !== "viewer"),
-    canMedical: isAdmin || roles.includes("medical_officer"),
+    primaryRole,
+    roleLabel: ROLE_LABELS[primaryRole] ?? "Unassigned",
+    isSuperAdmin,
+    isAdmin: isSuperAdmin,
+    can,
+    canWrite: isSuperAdmin || roles.some((r) => r !== "viewer"),
+    canMedical: isSuperAdmin || roles.includes("s1"),
     isViewer: roles.length === 0 || (roles.length === 1 && roles[0] === "viewer"),
   };
 }

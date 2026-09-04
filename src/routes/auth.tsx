@@ -1,36 +1,34 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Eye, EyeOff, Loader2, Shield } from "lucide-react";
-import { z } from "zod";
 
+import { RwandaFlag } from "@/components/rwanda-flag";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { loginWithUsername } from "@/lib/account.functions";
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Secure Sign In | Military Management System" },
-      { name: "description", content: "Sign in to the Military Personnel & Resource Management System." },
+      { name: "description", content: "Sign in to the Military Management System with your service username." },
       { property: "og:title", content: "Secure Sign In | Military Management System" },
-      { property: "og:description", content: "Authorised access only. Personnel, equipment and logistics management." },
+      { property: "og:description", content: "Authorised access only. Personnel, operations, intelligence and logistics." },
     ],
   }),
   component: AuthPage,
 });
 
-const schema = z.object({
-  email: z.string().trim().email({ message: "Enter a valid email address" }).max(255),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }).max(128),
-});
+const REMEMBER_KEY = "mms.remember.username";
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(true);
@@ -39,6 +37,8 @@ function AuthPage() {
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
+    const saved = localStorage.getItem(REMEMBER_KEY);
+    if (saved) setUsername(saved);
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) navigate({ to: "/dashboard", replace: true });
     });
@@ -48,41 +48,44 @@ function AuthPage() {
     e.preventDefault();
     setError(null);
     setNotice(null);
-    const parsed = schema.safeParse({ email, password });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Invalid credentials");
+    if (!username.trim() || password.length < 1) {
+      setError("Enter your username and password.");
       return;
     }
     setLoading(true);
-    if (mode === "login") {
-      const { error } = await supabase.auth.signInWithPassword(parsed.data);
-      setLoading(false);
-      if (error) {
-        setError("Authentication failed. Check your credentials and try again.");
-        return;
-      }
-      navigate({ to: "/dashboard", replace: true });
-    } else {
-      const { data, error } = await supabase.auth.signUp({
-        ...parsed.data,
-        options: { emailRedirectTo: window.location.origin },
+    try {
+      const result = await loginWithUsername({
+        data: { username: username.trim(), password },
       });
-      setLoading(false);
-      if (error) {
-        setError(error.message);
+      if (!result.ok) {
+        setError(result.error);
         return;
       }
-      if (data.session) navigate({ to: "/dashboard", replace: true });
-      else setNotice("Account created. Check your email to confirm your address before signing in.");
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: result.access_token,
+        refresh_token: result.refresh_token,
+      });
+      if (sessionError) {
+        setError("Could not start your session. Please try again.");
+        return;
+      }
+      if (remember) localStorage.setItem(REMEMBER_KEY, username.trim());
+      else localStorage.removeItem(REMEMBER_KEY);
+      navigate({ to: "/dashboard", replace: true });
+    } catch {
+      setError("Authentication service unavailable. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const resetPassword = async () => {
-    if (!email) {
-      setError("Enter your email address first, then select Forgot password.");
+    if (!username.includes("@")) {
+      setError("Enter your registered email address to receive a reset link.");
       return;
     }
-    await supabase.auth.resetPasswordForEmail(email, {
+    setError(null);
+    await supabase.auth.resetPasswordForEmail(username.trim(), {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setNotice("If the address exists, a password reset link has been sent.");
@@ -102,8 +105,11 @@ function AuthPage() {
       />
       <div className="relative w-full max-w-md">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="grid h-14 w-14 place-items-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
-            <Shield className="h-7 w-7" />
+          <div className="flex items-center gap-3">
+            <div className="grid h-14 w-14 place-items-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
+              <Shield className="h-7 w-7" />
+            </div>
+            <RwandaFlag className="h-10 w-14" />
           </div>
           <h1 className="mt-4 text-sm font-bold uppercase tracking-[0.28em] text-sidebar-foreground">
             Military Management System
@@ -117,16 +123,15 @@ function AuthPage() {
           <CardContent className="pt-6">
             <form onSubmit={submit} className="space-y-4">
               <div>
-                <Label htmlFor="email">Username / Email</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
+                  id="username"
+                  autoComplete="username"
+                  value={username}
                   maxLength={255}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="mt-1.5"
-                  placeholder="officer@example.mil"
+                  placeholder="admin"
                 />
               </div>
               <div>
@@ -135,7 +140,7 @@ function AuthPage() {
                   <Input
                     id="password"
                     type={show ? "text" : "password"}
-                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                    autoComplete="current-password"
                     value={password}
                     maxLength={128}
                     onChange={(e) => setPassword(e.target.value)}
@@ -163,7 +168,10 @@ function AuthPage() {
               </div>
 
               {error ? (
-                <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                <p
+                  role="alert"
+                  className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+                >
                   {error}
                 </p>
               ) : null}
@@ -175,24 +183,13 @@ function AuthPage() {
 
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {mode === "login" ? "Secure login" : "Create account"}
+                Secure login
               </Button>
-
-              <p className="text-center text-sm text-muted-foreground">
-                {mode === "login" ? "No account yet?" : "Already registered?"}{" "}
-                <button
-                  type="button"
-                  className="text-primary hover:underline"
-                  onClick={() => setMode(mode === "login" ? "signup" : "login")}
-                >
-                  {mode === "login" ? "Register" : "Sign in"}
-                </button>
-              </p>
             </form>
           </CardContent>
         </Card>
         <p className="mt-4 text-center text-xs text-sidebar-foreground/40">
-          The first registered account receives Super Admin access. Later accounts start as Viewer.
+          Accounts are issued by the Super Admin. Contact your system administrator for access.
         </p>
       </div>
     </div>
