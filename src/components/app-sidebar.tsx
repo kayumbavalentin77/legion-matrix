@@ -40,46 +40,52 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuthState } from "@/lib/auth";
+import { RwandaFlag } from "@/components/rwanda-flag";
+import { useAuthState, type Section } from "@/lib/auth";
 
-type Item = { title: string; url: string; icon: typeof Users; medical?: boolean };
+type Item = { title: string; url: string; icon: typeof Users };
+type Group = { label: string; sections?: Section[]; adminOnly?: boolean; items: Item[] };
 
-const GROUPS: { label: string; items: Item[] }[] = [
+const GROUPS: Group[] = [
   {
     label: "Overview",
-    items: [{ title: "Dashboard", url: "/dashboard", icon: LayoutDashboard }],
-  },
-  {
-    label: "Admin",
     items: [
-      { title: "Manage Users", url: "/users", icon: Users },
-      { title: "Soldier Registry", url: "/soldiers", icon: UserSquare2 },
-      { title: "Equipment Registry", url: "/equipment", icon: Boxes },
-      { title: "Physical Fitness", url: "/fitness", icon: Activity },
-      { title: "Medical Records", url: "/medical", icon: Stethoscope, medical: true },
+      { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
       { title: "Reports", url: "/reports", icon: FileBarChart },
     ],
   },
   {
-    label: "Operations",
+    label: "Administration",
+    adminOnly: true,
     items: [
-      { title: "Operation Planning", url: "/operations", icon: ClipboardList },
-      { title: "Mission Files", url: "/mission-files", icon: FolderOpen },
-      { title: "Documents", url: "/documents", icon: Files },
-      { title: "Mission Map", url: "/map", icon: MapIcon },
-      { title: "GPS Coordinates", url: "/coordinates", icon: Navigation },
+      { title: "Manage Users", url: "/users", icon: Users },
+      { title: "Audit Log", url: "/audit-log", icon: ScrollText },
+      { title: "Settings", url: "/settings", icon: Settings },
     ],
   },
   {
-    label: "Intelligence",
+    label: "S1 · Personnel",
+    sections: ["s1"],
     items: [
-      { title: "Security Reports", url: "/security-reports", icon: ShieldAlert },
-      { title: "Intelligence Files", url: "/intelligence-files", icon: FolderLock },
-      { title: "Threat Analysis", url: "/threat-analysis", icon: Gauge },
+      { title: "Soldier Registry", url: "/soldiers", icon: UserSquare2 },
+      { title: "Physical Fitness", url: "/fitness", icon: Activity },
+      { title: "Medical Records", url: "/medical", icon: Stethoscope },
     ],
   },
   {
-    label: "Vehicles",
+    label: "S1 · Equipment",
+    sections: ["s1"],
+    items: [
+      { title: "Equipment Registry", url: "/equipment", icon: Boxes },
+      { title: "Weapons Registry", url: "/weapons", icon: Crosshair },
+      { title: "Ammunition", url: "/ammunition", icon: Package },
+      { title: "Communications", url: "/communications", icon: Radio },
+      { title: "General Inventory", url: "/inventory", icon: Warehouse },
+    ],
+  },
+  {
+    label: "S1 · Vehicles",
+    sections: ["s1"],
     items: [
       { title: "Vehicle Registration", url: "/vehicles", icon: Car },
       { title: "Vehicle Status", url: "/vehicle-status", icon: Gauge },
@@ -89,19 +95,23 @@ const GROUPS: { label: string; items: Item[] }[] = [
     ],
   },
   {
-    label: "Equipment",
+    label: "S2 · Intelligence",
+    sections: ["s2"],
     items: [
-      { title: "Weapons Registry", url: "/weapons", icon: Crosshair },
-      { title: "Ammunition Inventory", url: "/ammunition", icon: Package },
-      { title: "Communication Equipment", url: "/communications", icon: Radio },
-      { title: "General Inventory", url: "/inventory", icon: Warehouse },
+      { title: "Security Reports", url: "/security-reports", icon: ShieldAlert },
+      { title: "Intelligence Files", url: "/intelligence-files", icon: FolderLock },
+      { title: "Threat Analysis", url: "/threat-analysis", icon: Gauge },
     ],
   },
   {
-    label: "System",
+    label: "S3 · Operations",
+    sections: ["s3"],
     items: [
-      { title: "Audit Log", url: "/audit-log", icon: ScrollText },
-      { title: "Settings", url: "/settings", icon: Settings },
+      { title: "Operation Planning", url: "/operations", icon: ClipboardList },
+      { title: "Mission Files", url: "/mission-files", icon: FolderOpen },
+      { title: "Documents", url: "/documents", icon: Files },
+      { title: "Mission Map", url: "/map", icon: MapIcon },
+      { title: "GPS Coordinates", url: "/coordinates", icon: Navigation },
     ],
   },
 ];
@@ -110,7 +120,13 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const { canMedical } = useAuthState();
+  const { can, isSuperAdmin } = useAuthState();
+
+  const visible = GROUPS.filter((group) => {
+    if (group.adminOnly) return isSuperAdmin;
+    if (!group.sections) return true;
+    return can(group.sections);
+  });
 
   return (
     <Sidebar collapsible="icon">
@@ -120,35 +136,36 @@ export function AppSidebar() {
             <Shield className="h-5 w-5" />
           </div>
           {!collapsed ? (
-            <div className="min-w-0">
-              <p className="truncate text-[0.72rem] font-bold uppercase leading-tight tracking-[0.14em] text-sidebar-foreground">
-                Military
-              </p>
-              <p className="truncate text-[0.62rem] uppercase leading-tight tracking-[0.18em] text-sidebar-foreground/60">
-                Management System
-              </p>
-            </div>
+            <>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[0.72rem] font-bold uppercase leading-tight tracking-[0.14em] text-sidebar-foreground">
+                  Military
+                </p>
+                <p className="truncate text-[0.62rem] uppercase leading-tight tracking-[0.18em] text-sidebar-foreground/60">
+                  Management System
+                </p>
+              </div>
+              <RwandaFlag className="h-5 w-7" />
+            </>
           ) : null}
         </div>
       </SidebarHeader>
       <SidebarContent>
-        {GROUPS.map((group) => (
+        {visible.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {group.items
-                  .filter((item) => !item.medical || canMedical)
-                  .map((item) => (
-                    <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton asChild isActive={pathname === item.url} tooltip={item.title}>
-                        <Link to={item.url} className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild isActive={pathname === item.url} tooltip={item.title}>
+                      <Link to={item.url} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
