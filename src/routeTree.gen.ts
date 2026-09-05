@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAmmunitionRouteImport } from './routes/_authenticated/ammunition'
+import { Route as AuthenticatedAuditLogRouteImport } from './routes/_authenticated/audit-log'
 import { Route as AuthenticatedCommunicationsRouteImport } from './routes/_authenticated/communications'
 import { Route as AuthenticatedCoordinatesRouteImport } from './routes/_authenticated/coordinates'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -31,8 +32,11 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSecurityReportsRouteImport } from './routes/_authenticated/security-reports'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSoldiersRouteImport } from './routes/_authenticated/soldiers'
+import { Route as AuthenticatedThreatAnalysisRouteImport } from './routes/_authenticated/threat-analysis'
+import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedVehicleFaultsRouteImport } from './routes/_authenticated/vehicle-faults'
 import { Route as AuthenticatedVehicleMaintenanceRouteImport } from './routes/_authenticated/vehicle-maintenance'
+import { Route as AuthenticatedVehicleStatusRouteImport } from './routes/_authenticated/vehicle-status'
 import { Route as AuthenticatedVehicleTrackingRouteImport } from './routes/_authenticated/vehicle-tracking'
 import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticated/vehicles'
 import { Route as AuthenticatedWeaponsRouteImport } from './routes/_authenticated/weapons'
@@ -59,6 +63,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const AuthenticatedAmmunitionRoute = AuthenticatedAmmunitionRouteImport.update({
   id: '/ammunition',
   path: '/ammunition',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAuditLogRoute = AuthenticatedAuditLogRouteImport.update({
+  id: '/audit-log',
+  path: '/audit-log',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCommunicationsRoute =
@@ -151,6 +160,17 @@ const AuthenticatedSoldiersRoute = AuthenticatedSoldiersRouteImport.update({
   path: '/soldiers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedThreatAnalysisRoute =
+  AuthenticatedThreatAnalysisRouteImport.update({
+    id: '/threat-analysis',
+    path: '/threat-analysis',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedVehicleFaultsRoute =
   AuthenticatedVehicleFaultsRouteImport.update({
     id: '/vehicle-faults',
@@ -161,6 +181,12 @@ const AuthenticatedVehicleMaintenanceRoute =
   AuthenticatedVehicleMaintenanceRouteImport.update({
     id: '/vehicle-maintenance',
     path: '/vehicle-maintenance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedVehicleStatusRoute =
+  AuthenticatedVehicleStatusRouteImport.update({
+    id: '/vehicle-status',
+    path: '/vehicle-status',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedVehicleTrackingRoute =
@@ -185,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/audit-log': typeof AuthenticatedAuditLogRoute
   '/communications': typeof AuthenticatedCommunicationsRoute
   '/coordinates': typeof AuthenticatedCoordinatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -202,8 +229,11 @@ export interface FileRoutesByFullPath {
   '/security-reports': typeof AuthenticatedSecurityReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/soldiers': typeof AuthenticatedSoldiersRoute
+  '/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
+  '/users': typeof AuthenticatedUsersRoute
   '/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
+  '/vehicle-status': typeof AuthenticatedVehicleStatusRoute
   '/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
   '/vehicles': typeof AuthenticatedVehiclesRoute
   '/weapons': typeof AuthenticatedWeaponsRoute
@@ -213,6 +243,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/audit-log': typeof AuthenticatedAuditLogRoute
   '/communications': typeof AuthenticatedCommunicationsRoute
   '/coordinates': typeof AuthenticatedCoordinatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -230,8 +261,11 @@ export interface FileRoutesByTo {
   '/security-reports': typeof AuthenticatedSecurityReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/soldiers': typeof AuthenticatedSoldiersRoute
+  '/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
+  '/users': typeof AuthenticatedUsersRoute
   '/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
+  '/vehicle-status': typeof AuthenticatedVehicleStatusRoute
   '/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
   '/vehicles': typeof AuthenticatedVehiclesRoute
   '/weapons': typeof AuthenticatedWeaponsRoute
@@ -243,6 +277,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/_authenticated/audit-log': typeof AuthenticatedAuditLogRoute
   '/_authenticated/communications': typeof AuthenticatedCommunicationsRoute
   '/_authenticated/coordinates': typeof AuthenticatedCoordinatesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -260,8 +295,11 @@ export interface FileRoutesById {
   '/_authenticated/security-reports': typeof AuthenticatedSecurityReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/soldiers': typeof AuthenticatedSoldiersRoute
+  '/_authenticated/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
+  '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/_authenticated/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
+  '/_authenticated/vehicle-status': typeof AuthenticatedVehicleStatusRoute
   '/_authenticated/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
   '/_authenticated/vehicles': typeof AuthenticatedVehiclesRoute
   '/_authenticated/weapons': typeof AuthenticatedWeaponsRoute
@@ -273,6 +311,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/ammunition'
+    | '/audit-log'
     | '/communications'
     | '/coordinates'
     | '/dashboard'
@@ -290,8 +329,11 @@ export interface FileRouteTypes {
     | '/security-reports'
     | '/settings'
     | '/soldiers'
+    | '/threat-analysis'
+    | '/users'
     | '/vehicle-faults'
     | '/vehicle-maintenance'
+    | '/vehicle-status'
     | '/vehicle-tracking'
     | '/vehicles'
     | '/weapons'
@@ -301,6 +343,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/ammunition'
+    | '/audit-log'
     | '/communications'
     | '/coordinates'
     | '/dashboard'
@@ -318,8 +361,11 @@ export interface FileRouteTypes {
     | '/security-reports'
     | '/settings'
     | '/soldiers'
+    | '/threat-analysis'
+    | '/users'
     | '/vehicle-faults'
     | '/vehicle-maintenance'
+    | '/vehicle-status'
     | '/vehicle-tracking'
     | '/vehicles'
     | '/weapons'
@@ -330,6 +376,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/ammunition'
+    | '/_authenticated/audit-log'
     | '/_authenticated/communications'
     | '/_authenticated/coordinates'
     | '/_authenticated/dashboard'
@@ -347,8 +394,11 @@ export interface FileRouteTypes {
     | '/_authenticated/security-reports'
     | '/_authenticated/settings'
     | '/_authenticated/soldiers'
+    | '/_authenticated/threat-analysis'
+    | '/_authenticated/users'
     | '/_authenticated/vehicle-faults'
     | '/_authenticated/vehicle-maintenance'
+    | '/_authenticated/vehicle-status'
     | '/_authenticated/vehicle-tracking'
     | '/_authenticated/vehicles'
     | '/_authenticated/weapons'
@@ -396,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: '/ammunition'
       fullPath: '/ammunition'
       preLoaderRoute: typeof AuthenticatedAmmunitionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/audit-log': {
+      id: '/_authenticated/audit-log'
+      path: '/audit-log'
+      fullPath: '/audit-log'
+      preLoaderRoute: typeof AuthenticatedAuditLogRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/communications': {
@@ -517,6 +574,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSoldiersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/threat-analysis': {
+      id: '/_authenticated/threat-analysis'
+      path: '/threat-analysis'
+      fullPath: '/threat-analysis'
+      preLoaderRoute: typeof AuthenticatedThreatAnalysisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/users': {
+      id: '/_authenticated/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthenticatedUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/vehicle-faults': {
       id: '/_authenticated/vehicle-faults'
       path: '/vehicle-faults'
@@ -529,6 +600,13 @@ declare module '@tanstack/react-router' {
       path: '/vehicle-maintenance'
       fullPath: '/vehicle-maintenance'
       preLoaderRoute: typeof AuthenticatedVehicleMaintenanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vehicle-status': {
+      id: '/_authenticated/vehicle-status'
+      path: '/vehicle-status'
+      fullPath: '/vehicle-status'
+      preLoaderRoute: typeof AuthenticatedVehicleStatusRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/vehicle-tracking': {
@@ -557,6 +635,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAmmunitionRoute: typeof AuthenticatedAmmunitionRoute
+  AuthenticatedAuditLogRoute: typeof AuthenticatedAuditLogRoute
   AuthenticatedCommunicationsRoute: typeof AuthenticatedCommunicationsRoute
   AuthenticatedCoordinatesRoute: typeof AuthenticatedCoordinatesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -574,8 +653,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSecurityReportsRoute: typeof AuthenticatedSecurityReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSoldiersRoute: typeof AuthenticatedSoldiersRoute
+  AuthenticatedThreatAnalysisRoute: typeof AuthenticatedThreatAnalysisRoute
+  AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVehicleFaultsRoute: typeof AuthenticatedVehicleFaultsRoute
   AuthenticatedVehicleMaintenanceRoute: typeof AuthenticatedVehicleMaintenanceRoute
+  AuthenticatedVehicleStatusRoute: typeof AuthenticatedVehicleStatusRoute
   AuthenticatedVehicleTrackingRoute: typeof AuthenticatedVehicleTrackingRoute
   AuthenticatedVehiclesRoute: typeof AuthenticatedVehiclesRoute
   AuthenticatedWeaponsRoute: typeof AuthenticatedWeaponsRoute
@@ -583,6 +665,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAmmunitionRoute: AuthenticatedAmmunitionRoute,
+  AuthenticatedAuditLogRoute: AuthenticatedAuditLogRoute,
   AuthenticatedCommunicationsRoute: AuthenticatedCommunicationsRoute,
   AuthenticatedCoordinatesRoute: AuthenticatedCoordinatesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
@@ -600,8 +683,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSecurityReportsRoute: AuthenticatedSecurityReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSoldiersRoute: AuthenticatedSoldiersRoute,
+  AuthenticatedThreatAnalysisRoute: AuthenticatedThreatAnalysisRoute,
+  AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVehicleFaultsRoute: AuthenticatedVehicleFaultsRoute,
   AuthenticatedVehicleMaintenanceRoute: AuthenticatedVehicleMaintenanceRoute,
+  AuthenticatedVehicleStatusRoute: AuthenticatedVehicleStatusRoute,
   AuthenticatedVehicleTrackingRoute: AuthenticatedVehicleTrackingRoute,
   AuthenticatedVehiclesRoute: AuthenticatedVehiclesRoute,
   AuthenticatedWeaponsRoute: AuthenticatedWeaponsRoute,
