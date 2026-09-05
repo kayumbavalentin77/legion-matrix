@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAmmunitionRouteImport } from './routes/_authenticated/ammunition'
+import { Route as AuthenticatedAuditLogRouteImport } from './routes/_authenticated/audit-log'
 import { Route as AuthenticatedCommunicationsRouteImport } from './routes/_authenticated/communications'
 import { Route as AuthenticatedCoordinatesRouteImport } from './routes/_authenticated/coordinates'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -61,6 +62,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const AuthenticatedAmmunitionRoute = AuthenticatedAmmunitionRouteImport.update({
   id: '/ammunition',
   path: '/ammunition',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAuditLogRoute = AuthenticatedAuditLogRouteImport.update({
+  id: '/audit-log',
+  path: '/audit-log',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCommunicationsRoute =
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/audit-log': typeof AuthenticatedAuditLogRoute
   '/communications': typeof AuthenticatedCommunicationsRoute
   '/coordinates': typeof AuthenticatedCoordinatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/audit-log': typeof AuthenticatedAuditLogRoute
   '/communications': typeof AuthenticatedCommunicationsRoute
   '/coordinates': typeof AuthenticatedCoordinatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/ammunition': typeof AuthenticatedAmmunitionRoute
+  '/_authenticated/audit-log': typeof AuthenticatedAuditLogRoute
   '/_authenticated/communications': typeof AuthenticatedCommunicationsRoute
   '/_authenticated/coordinates': typeof AuthenticatedCoordinatesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/ammunition'
+    | '/audit-log'
     | '/communications'
     | '/coordinates'
     | '/dashboard'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/ammunition'
+    | '/audit-log'
     | '/communications'
     | '/coordinates'
     | '/dashboard'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/ammunition'
+    | '/_authenticated/audit-log'
     | '/_authenticated/communications'
     | '/_authenticated/coordinates'
     | '/_authenticated/dashboard'
@@ -422,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/ammunition'
       fullPath: '/ammunition'
       preLoaderRoute: typeof AuthenticatedAmmunitionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/audit-log': {
+      id: '/_authenticated/audit-log'
+      path: '/audit-log'
+      fullPath: '/audit-log'
+      preLoaderRoute: typeof AuthenticatedAuditLogRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/communications': {
@@ -597,6 +616,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAmmunitionRoute: typeof AuthenticatedAmmunitionRoute
+  AuthenticatedAuditLogRoute: typeof AuthenticatedAuditLogRoute
   AuthenticatedCommunicationsRoute: typeof AuthenticatedCommunicationsRoute
   AuthenticatedCoordinatesRoute: typeof AuthenticatedCoordinatesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -625,6 +645,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAmmunitionRoute: AuthenticatedAmmunitionRoute,
+  AuthenticatedAuditLogRoute: AuthenticatedAuditLogRoute,
   AuthenticatedCommunicationsRoute: AuthenticatedCommunicationsRoute,
   AuthenticatedCoordinatesRoute: AuthenticatedCoordinatesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
