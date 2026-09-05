@@ -33,6 +33,7 @@ import { Route as AuthenticatedSecurityReportsRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSoldiersRouteImport } from './routes/_authenticated/soldiers'
 import { Route as AuthenticatedThreatAnalysisRouteImport } from './routes/_authenticated/threat-analysis'
+import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedVehicleFaultsRouteImport } from './routes/_authenticated/vehicle-faults'
 import { Route as AuthenticatedVehicleMaintenanceRouteImport } from './routes/_authenticated/vehicle-maintenance'
 import { Route as AuthenticatedVehicleStatusRouteImport } from './routes/_authenticated/vehicle-status'
@@ -165,6 +166,11 @@ const AuthenticatedThreatAnalysisRoute =
     path: '/threat-analysis',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedVehicleFaultsRoute =
   AuthenticatedVehicleFaultsRouteImport.update({
     id: '/vehicle-faults',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/soldiers': typeof AuthenticatedSoldiersRoute
   '/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
+  '/users': typeof AuthenticatedUsersRoute
   '/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
   '/vehicle-status': typeof AuthenticatedVehicleStatusRoute
@@ -255,6 +262,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/soldiers': typeof AuthenticatedSoldiersRoute
   '/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
+  '/users': typeof AuthenticatedUsersRoute
   '/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
   '/vehicle-status': typeof AuthenticatedVehicleStatusRoute
@@ -288,6 +296,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/soldiers': typeof AuthenticatedSoldiersRoute
   '/_authenticated/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
+  '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/_authenticated/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
   '/_authenticated/vehicle-status': typeof AuthenticatedVehicleStatusRoute
@@ -321,6 +330,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/soldiers'
     | '/threat-analysis'
+    | '/users'
     | '/vehicle-faults'
     | '/vehicle-maintenance'
     | '/vehicle-status'
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/soldiers'
     | '/threat-analysis'
+    | '/users'
     | '/vehicle-faults'
     | '/vehicle-maintenance'
     | '/vehicle-status'
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/soldiers'
     | '/_authenticated/threat-analysis'
+    | '/_authenticated/users'
     | '/_authenticated/vehicle-faults'
     | '/_authenticated/vehicle-maintenance'
     | '/_authenticated/vehicle-status'
@@ -569,6 +581,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedThreatAnalysisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/users': {
+      id: '/_authenticated/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthenticatedUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/vehicle-faults': {
       id: '/_authenticated/vehicle-faults'
       path: '/vehicle-faults'
@@ -635,6 +654,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSoldiersRoute: typeof AuthenticatedSoldiersRoute
   AuthenticatedThreatAnalysisRoute: typeof AuthenticatedThreatAnalysisRoute
+  AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVehicleFaultsRoute: typeof AuthenticatedVehicleFaultsRoute
   AuthenticatedVehicleMaintenanceRoute: typeof AuthenticatedVehicleMaintenanceRoute
   AuthenticatedVehicleStatusRoute: typeof AuthenticatedVehicleStatusRoute
@@ -664,6 +684,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSoldiersRoute: AuthenticatedSoldiersRoute,
   AuthenticatedThreatAnalysisRoute: AuthenticatedThreatAnalysisRoute,
+  AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVehicleFaultsRoute: AuthenticatedVehicleFaultsRoute,
   AuthenticatedVehicleMaintenanceRoute: AuthenticatedVehicleMaintenanceRoute,
   AuthenticatedVehicleStatusRoute: AuthenticatedVehicleStatusRoute,
