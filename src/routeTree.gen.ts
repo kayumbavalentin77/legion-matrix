@@ -31,6 +31,7 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSecurityReportsRouteImport } from './routes/_authenticated/security-reports'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSoldiersRouteImport } from './routes/_authenticated/soldiers'
+import { Route as AuthenticatedThreatAnalysisRouteImport } from './routes/_authenticated/threat-analysis'
 import { Route as AuthenticatedVehicleFaultsRouteImport } from './routes/_authenticated/vehicle-faults'
 import { Route as AuthenticatedVehicleMaintenanceRouteImport } from './routes/_authenticated/vehicle-maintenance'
 import { Route as AuthenticatedVehicleTrackingRouteImport } from './routes/_authenticated/vehicle-tracking'
@@ -151,6 +152,12 @@ const AuthenticatedSoldiersRoute = AuthenticatedSoldiersRouteImport.update({
   path: '/soldiers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedThreatAnalysisRoute =
+  AuthenticatedThreatAnalysisRouteImport.update({
+    id: '/threat-analysis',
+    path: '/threat-analysis',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedVehicleFaultsRoute =
   AuthenticatedVehicleFaultsRouteImport.update({
     id: '/vehicle-faults',
@@ -202,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/security-reports': typeof AuthenticatedSecurityReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/soldiers': typeof AuthenticatedSoldiersRoute
+  '/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
   '/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
   '/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
@@ -230,6 +238,7 @@ export interface FileRoutesByTo {
   '/security-reports': typeof AuthenticatedSecurityReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/soldiers': typeof AuthenticatedSoldiersRoute
+  '/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
   '/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
   '/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
@@ -260,6 +269,7 @@ export interface FileRoutesById {
   '/_authenticated/security-reports': typeof AuthenticatedSecurityReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/soldiers': typeof AuthenticatedSoldiersRoute
+  '/_authenticated/threat-analysis': typeof AuthenticatedThreatAnalysisRoute
   '/_authenticated/vehicle-faults': typeof AuthenticatedVehicleFaultsRoute
   '/_authenticated/vehicle-maintenance': typeof AuthenticatedVehicleMaintenanceRoute
   '/_authenticated/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/security-reports'
     | '/settings'
     | '/soldiers'
+    | '/threat-analysis'
     | '/vehicle-faults'
     | '/vehicle-maintenance'
     | '/vehicle-tracking'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/security-reports'
     | '/settings'
     | '/soldiers'
+    | '/threat-analysis'
     | '/vehicle-faults'
     | '/vehicle-maintenance'
     | '/vehicle-tracking'
@@ -347,6 +359,7 @@ export interface FileRouteTypes {
     | '/_authenticated/security-reports'
     | '/_authenticated/settings'
     | '/_authenticated/soldiers'
+    | '/_authenticated/threat-analysis'
     | '/_authenticated/vehicle-faults'
     | '/_authenticated/vehicle-maintenance'
     | '/_authenticated/vehicle-tracking'
@@ -517,6 +530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSoldiersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/threat-analysis': {
+      id: '/_authenticated/threat-analysis'
+      path: '/threat-analysis'
+      fullPath: '/threat-analysis'
+      preLoaderRoute: typeof AuthenticatedThreatAnalysisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/vehicle-faults': {
       id: '/_authenticated/vehicle-faults'
       path: '/vehicle-faults'
@@ -574,6 +594,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSecurityReportsRoute: typeof AuthenticatedSecurityReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSoldiersRoute: typeof AuthenticatedSoldiersRoute
+  AuthenticatedThreatAnalysisRoute: typeof AuthenticatedThreatAnalysisRoute
   AuthenticatedVehicleFaultsRoute: typeof AuthenticatedVehicleFaultsRoute
   AuthenticatedVehicleMaintenanceRoute: typeof AuthenticatedVehicleMaintenanceRoute
   AuthenticatedVehicleTrackingRoute: typeof AuthenticatedVehicleTrackingRoute
@@ -600,6 +621,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSecurityReportsRoute: AuthenticatedSecurityReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSoldiersRoute: AuthenticatedSoldiersRoute,
+  AuthenticatedThreatAnalysisRoute: AuthenticatedThreatAnalysisRoute,
   AuthenticatedVehicleFaultsRoute: AuthenticatedVehicleFaultsRoute,
   AuthenticatedVehicleMaintenanceRoute: AuthenticatedVehicleMaintenanceRoute,
   AuthenticatedVehicleTrackingRoute: AuthenticatedVehicleTrackingRoute,
