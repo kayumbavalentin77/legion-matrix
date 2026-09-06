@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell, CircleHelp, LogOut, User } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
+import { RwandaFlag } from "@/components/rwanda-flag";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,9 +68,11 @@ function AuthenticatedLayout() {
                 {profile?.full_name || user?.email || "Signed in"}
               </p>
               <p className="truncate text-xs text-muted-foreground">
-                {roles.length ? roles.map((r) => ROLE_LABELS[r]).join(" · ") : "No role assigned"}
+                {roles.length ? roles.map((r) => ROLE_LABELS[r] ?? r).join(" · ") : "No section assigned"}
               </p>
             </div>
+
+            <RwandaFlag className="hidden h-5 w-8 sm:block" />
 
             <Popover>
               <PopoverTrigger asChild>
