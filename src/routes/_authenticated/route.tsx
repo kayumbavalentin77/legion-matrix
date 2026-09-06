@@ -67,9 +67,11 @@ function AuthenticatedLayout() {
                 {profile?.full_name || user?.email || "Signed in"}
               </p>
               <p className="truncate text-xs text-muted-foreground">
-                {roles.length ? roles.map((r) => ROLE_LABELS[r]).join(" · ") : "No role assigned"}
+                {roles.length ? roles.map((r) => ROLE_LABELS[r] ?? r).join(" · ") : "No section assigned"}
               </p>
             </div>
+
+            <RwandaFlag className="hidden h-5 w-8 sm:block" />
 
             <Popover>
               <PopoverTrigger asChild>
