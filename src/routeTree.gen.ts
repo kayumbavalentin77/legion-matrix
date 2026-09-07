@@ -40,6 +40,7 @@ import { Route as AuthenticatedVehicleStatusRouteImport } from './routes/_authen
 import { Route as AuthenticatedVehicleTrackingRouteImport } from './routes/_authenticated/vehicle-tracking'
 import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticated/vehicles'
 import { Route as AuthenticatedWeaponsRouteImport } from './routes/_authenticated/weapons'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -205,6 +206,11 @@ const AuthenticatedWeaponsRoute = AuthenticatedWeaponsRouteImport.update({
   path: '/weapons',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -237,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
   '/vehicles': typeof AuthenticatedVehiclesRoute
   '/weapons': typeof AuthenticatedWeaponsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
   '/vehicles': typeof AuthenticatedVehiclesRoute
   '/weapons': typeof AuthenticatedWeaponsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -303,6 +311,7 @@ export interface FileRoutesById {
   '/_authenticated/vehicle-tracking': typeof AuthenticatedVehicleTrackingRoute
   '/_authenticated/vehicles': typeof AuthenticatedVehiclesRoute
   '/_authenticated/weapons': typeof AuthenticatedWeaponsRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -337,6 +346,7 @@ export interface FileRouteTypes {
     | '/vehicle-tracking'
     | '/vehicles'
     | '/weapons'
+    | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/vehicle-tracking'
     | '/vehicles'
     | '/weapons'
+    | '/admin/users'
   id:
     | '__root__'
     | '/'
@@ -402,6 +413,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vehicle-tracking'
     | '/_authenticated/vehicles'
     | '/_authenticated/weapons'
+    | '/_authenticated/admin/users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -630,6 +642,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWeaponsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -661,6 +680,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVehicleTrackingRoute: typeof AuthenticatedVehicleTrackingRoute
   AuthenticatedVehiclesRoute: typeof AuthenticatedVehiclesRoute
   AuthenticatedWeaponsRoute: typeof AuthenticatedWeaponsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -691,6 +711,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVehicleTrackingRoute: AuthenticatedVehicleTrackingRoute,
   AuthenticatedVehiclesRoute: AuthenticatedVehiclesRoute,
   AuthenticatedWeaponsRoute: AuthenticatedWeaponsRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
