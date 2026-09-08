@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Download, Pencil, Plus, Printer, Search, Trash2, Inbox, Eye } from "lucide-react";
+import { Bookmark, BookmarkPlus, Download, Pencil, Plus, Printer, Search, Trash2, Inbox, Eye, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
