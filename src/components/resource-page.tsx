@@ -425,6 +425,47 @@ export function ResourcePage({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <Dialog open={presetOpen} onOpenChange={setPresetOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Save this view</DialogTitle>
+            <DialogDescription>
+              Store the current search and filters so you can re-run them in one click.
+            </DialogDescription>
+          </DialogHeader>
+          <div>
+            <Label htmlFor="preset-name">Preset name</Label>
+            <Input
+              id="preset-name"
+              value={presetName}
+              onChange={(e) => setPresetName(e.target.value)}
+              className="mt-1.5"
+              placeholder="e.g. Active soldiers in 1st Battalion"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPresetOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!presetName.trim() || savePreset.isPending}
+              onClick={() =>
+                savePreset.mutate(
+                  { name: presetName, config: { query, filters: filterValues } },
+                  {
+                    onSuccess: () => {
+                      setPresetName("");
+                      setPresetOpen(false);
+                    },
+                  },
+                )
+              }
+            >
+              Save preset
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
