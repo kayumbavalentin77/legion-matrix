@@ -43,6 +43,15 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { useAuthState } from "@/lib/auth";
+import { usePresets } from "@/lib/presets";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { exportCsv, formatDate, useDeleteRow, useRows, useSaveRow, type Row } from "@/lib/data";
 
 export type Field = {
