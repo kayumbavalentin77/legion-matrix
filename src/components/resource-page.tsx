@@ -114,6 +114,25 @@ export function ResourcePage({
   const [editing, setEditing] = useState<Row | null>(null);
   const [viewing, setViewing] = useState<Row | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [presetName, setPresetName] = useState("");
+  const [presetOpen, setPresetOpen] = useState(false);
+
+  const { presets, save: savePreset, remove: removePreset } = usePresets(module);
+
+  const filtersDirty =
+    query.trim() !== "" || Object.values(filterValues).some((v) => v && v !== "all");
+
+  const clearFilters = () => {
+    setQuery("");
+    setFilterValues({});
+    setPage(1);
+  };
+
+  const applyPreset = (config: { query?: string; filters?: Record<string, string> }) => {
+    setQuery(config.query ?? "");
+    setFilterValues(config.filters ?? {});
+    setPage(1);
+  };
 
   const filtered = useMemo(() => {
     let list = rows ?? [];
