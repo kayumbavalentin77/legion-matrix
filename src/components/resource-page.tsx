@@ -229,6 +229,54 @@ export function ResourcePage({
                 </SelectContent>
               </Select>
             ))}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Bookmark className="mr-1.5 h-4 w-4" /> Presets
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>Saved searches</DropdownMenuLabel>
+                {presets.length === 0 ? (
+                  <p className="px-2 py-2 text-xs text-muted-foreground">
+                    No saved presets yet. Set a search or filters, then save them here.
+                  </p>
+                ) : (
+                  presets.map((p) => (
+                    <DropdownMenuItem
+                      key={p.id}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        applyPreset(p.config ?? { query: "", filters: {} });
+                      }}
+                      className="flex items-center justify-between gap-2"
+                    >
+                      <span className="truncate">{p.name}</span>
+                      <button
+                        type="button"
+                        aria-label={`Remove preset ${p.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removePreset.mutate(p.id);
+                        }}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </DropdownMenuItem>
+                  ))
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => setPresetOpen(true)}>
+                  <BookmarkPlus className="mr-2 h-4 w-4" /> Save current view
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="outline" size="sm" onClick={clearFilters} disabled={!filtersDirty}>
+              <X className="mr-1.5 h-4 w-4" /> Clear filters
+            </Button>
           </div>
 
           {error ? (
