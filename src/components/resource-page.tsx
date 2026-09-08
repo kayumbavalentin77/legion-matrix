@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Download, Pencil, Plus, Printer, Search, Trash2, Inbox, Eye } from "lucide-react";
+import { Bookmark, BookmarkPlus, Download, Pencil, Plus, Printer, Search, Trash2, Inbox, Eye, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,6 +43,15 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { useAuthState } from "@/lib/auth";
+import { usePresets } from "@/lib/presets";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { exportCsv, formatDate, useDeleteRow, useRows, useSaveRow, type Row } from "@/lib/data";
 
 export type Field = {
@@ -105,6 +114,25 @@ export function ResourcePage({
   const [editing, setEditing] = useState<Row | null>(null);
   const [viewing, setViewing] = useState<Row | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [presetName, setPresetName] = useState("");
+  const [presetOpen, setPresetOpen] = useState(false);
+
+  const { presets, save: savePreset, remove: removePreset } = usePresets(module);
+
+  const filtersDirty =
+    query.trim() !== "" || Object.values(filterValues).some((v) => v && v !== "all");
+
+  const clearFilters = () => {
+    setQuery("");
+    setFilterValues({});
+    setPage(1);
+  };
+
+  const applyPreset = (config: { query?: string; filters?: Record<string, string> }) => {
+    setQuery(config.query ?? "");
+    setFilterValues(config.filters ?? {});
+    setPage(1);
+  };
 
   const filtered = useMemo(() => {
     let list = rows ?? [];
@@ -201,6 +229,54 @@ export function ResourcePage({
                 </SelectContent>
               </Select>
             ))}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Bookmark className="mr-1.5 h-4 w-4" /> Presets
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>Saved searches</DropdownMenuLabel>
+                {presets.length === 0 ? (
+                  <p className="px-2 py-2 text-xs text-muted-foreground">
+                    No saved presets yet. Set a search or filters, then save them here.
+                  </p>
+                ) : (
+                  presets.map((p) => (
+                    <DropdownMenuItem
+                      key={p.id}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        applyPreset(p.config ?? { query: "", filters: {} });
+                      }}
+                      className="flex items-center justify-between gap-2"
+                    >
+                      <span className="truncate">{p.name}</span>
+                      <button
+                        type="button"
+                        aria-label={`Remove preset ${p.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removePreset.mutate(p.id);
+                        }}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </DropdownMenuItem>
+                  ))
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => setPresetOpen(true)}>
+                  <BookmarkPlus className="mr-2 h-4 w-4" /> Save current view
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="outline" size="sm" onClick={clearFilters} disabled={!filtersDirty}>
+              <X className="mr-1.5 h-4 w-4" /> Clear filters
+            </Button>
           </div>
 
           {error ? (
@@ -349,6 +425,47 @@ export function ResourcePage({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <Dialog open={presetOpen} onOpenChange={setPresetOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Save this view</DialogTitle>
+            <DialogDescription>
+              Store the current search and filters so you can re-run them in one click.
+            </DialogDescription>
+          </DialogHeader>
+          <div>
+            <Label htmlFor="preset-name">Preset name</Label>
+            <Input
+              id="preset-name"
+              value={presetName}
+              onChange={(e) => setPresetName(e.target.value)}
+              className="mt-1.5"
+              placeholder="e.g. Active soldiers in 1st Battalion"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPresetOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!presetName.trim() || savePreset.isPending}
+              onClick={() =>
+                savePreset.mutate(
+                  { name: presetName, config: { query, filters: filterValues } },
+                  {
+                    onSuccess: () => {
+                      setPresetName("");
+                      setPresetOpen(false);
+                    },
+                  },
+                )
+              }
+            >
+              Save preset
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
