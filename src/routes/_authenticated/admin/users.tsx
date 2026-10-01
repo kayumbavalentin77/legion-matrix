@@ -78,9 +78,8 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
       .from("user_roles")
       .select("role")
       .eq("user_id", userData.user.id)
-      .eq("role", "super_admin")
-      .maybeSingle();
-    if (!data) throw redirect({ to: "/dashboard" });
+      .in("role", ["super_admin", "administrator"]);
+    if (!data || data.length === 0) throw redirect({ to: "/dashboard" });
   },
   head: () => ({
     meta: [
@@ -116,7 +115,10 @@ const SECTION_ROLES = [
   { value: "s1", label: "S1", hint: "Personnel & Equipment" },
   { value: "s2", label: "S2", hint: "Intelligence" },
   { value: "s3", label: "S3", hint: "Operations" },
+  { value: "viewer", label: "Unassigned", hint: "No section access" },
 ];
+const ADMIN_ROLE = { value: "administrator", label: "Administrator", hint: "User management" };
+const DEPARTMENTS = ["Personnel (S1)", "Intelligence (S2)", "Operations (S3)", "Logistics", "Medical", "Headquarters"];
 
 const ROLE_BADGE: Record<string, string> = {
   s1: "bg-chart-1/15 text-chart-1 border-chart-1/30",
@@ -136,6 +138,13 @@ function RoleBadge({ role }: { role: string }) {
       </Badge>
     );
   }
+  if (role === "administrator") {
+    return (
+      <Badge variant="outline" className="border-primary/30 bg-primary/5 text-primary">
+        Administrator
+      </Badge>
+    );
+  }
   const known = SECTION_ROLES.find((r) => r.value === role);
   return (
     <Badge variant="outline" className={ROLE_BADGE[role] ?? ""}>
@@ -148,6 +157,7 @@ const EMPTY_FORM = {
   id: "",
   full_name: "",
   username: "",
+  email: "",
   phone: "",
   department: "",
   status: "Active",
@@ -174,13 +184,16 @@ function UserManagementPage() {
   const [deleteTarget, setDeleteTarget] = useState<Account | null>(null);
 
   const {
-    data: accounts = [],
+    data: listing,
     isLoading,
     error,
   } = useQuery({
     queryKey: ["accounts"],
-    queryFn: async () => (await listAccounts()) as unknown as Account[],
+    queryFn: async () => (await listAccounts()) as unknown as { isSuper: boolean; accounts: Account[] },
   });
+  const accounts = listing?.accounts ?? [];
+  const callerIsSuper = listing?.isSuper ?? false;
+  const roleChoices = callerIsSuper ? [...SECTION_ROLES, ADMIN_ROLE] : SECTION_ROLES;
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["accounts"] });
 
@@ -199,7 +212,7 @@ function UserManagementPage() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return accounts.filter((a) => {
-      if (q && !String(a.username ?? "").toLowerCase().includes(q) && !String(a.full_name ?? "").toLowerCase().includes(q))
+      if (q && ![a.username, a.full_name, a.email].some((v) => String(v ?? "").toLowerCase().includes(q)))
         return false;
       if (roleFilter !== "all" && a.role !== roleFilter) return false;
       if (statusFilter !== "all" && (statusFilter === "Active") !== isActive(a.status)) return false;
@@ -222,6 +235,7 @@ function UserManagementPage() {
             id: form.id,
             full_name: form.full_name || form.username,
             username: form.username,
+            email: form.email.trim(),
             phone: form.phone || null,
             department: form.department || null,
             status: form.status === "Inactive" ? "Inactive" : "Active",
@@ -233,8 +247,11 @@ function UserManagementPage() {
           data: {
             full_name: form.full_name || form.username,
             username: form.username,
+            email: form.email.trim(),
             password: form.password,
             phone: form.phone || null,
+            department: form.department || null,
+            status: form.status === "Inactive" ? "Inactive" : "Active",
             role: form.role as "s1",
           },
         });
@@ -296,10 +313,11 @@ function UserManagementPage() {
       id: account.id,
       full_name: account.full_name ?? "",
       username: account.username ?? "",
+      email: account.email ?? "",
       phone: account.phone ?? "",
       department: account.department ?? "",
       status: isActive(account.status) ? "Active" : "Inactive",
-      role: SECTION_ROLES.some((r) => r.value === account.role) ? account.role : "s1",
+      role: account.role,
     });
     setFormError(null);
     setFormOpen(true);
@@ -310,6 +328,7 @@ function UserManagementPage() {
     if (!form.username.trim()) return setFormError("Username is required.");
     if (!/^[a-zA-Z0-9._-]{3,60}$/.test(form.username.trim()))
       return setFormError("Username must be 3–60 characters (letters, numbers, dot, dash or underscore).");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return setFormError("A valid email is required.");
     if (!form.role) return setFormError("Role is required.");
     if (!form.id) {
       if (!form.password) return setFormError("Password is required.");
@@ -435,24 +454,27 @@ function UserManagementPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Full name</TableHead>
                     <TableHead>Username</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Department</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Last login</TableHead>
                     <TableHead>Created</TableHead>
-                    <TableHead>Last updated</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filtered.map((a) => {
-                    const locked = a.role === "super_admin";
+                    const locked = a.role === "super_admin" || (a.role === "administrator" && !callerIsSuper);
                     const self = a.id === user?.id;
                     return (
                       <TableRow key={a.id}>
-                        <TableCell className="font-medium">
-                          <span className="block truncate">{a.username ?? "—"}</span>
-                          <span className="block truncate text-xs text-muted-foreground">{a.full_name}</span>
-                        </TableCell>
+                        <TableCell className="font-medium">{a.full_name || "—"}</TableCell>
+                        <TableCell>{a.username ?? "—"}</TableCell>
+                        <TableCell className="max-w-[200px] truncate text-sm">{a.email ?? "—"}</TableCell>
+                        <TableCell className="text-sm">{a.department ?? "—"}</TableCell>
                         <TableCell>
                           <RoleBadge role={a.role} />
                         </TableCell>
@@ -469,10 +491,10 @@ function UserManagementPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                          {formatDate(a.created_at)}
+                          {a.last_login ? new Date(a.last_login).toLocaleString() : "Never"}
                         </TableCell>
                         <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                          {formatDate(a.updated_at)}
+                          {formatDate(a.created_at)}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
@@ -488,6 +510,7 @@ function UserManagementPage() {
                             <Button
                               variant="ghost"
                               size="icon"
+                              disabled={locked && !(self && callerIsSuper)}
                               onClick={() => {
                                 setResetPwd({ password: "", confirm: "" });
                                 setResetTarget(a);
@@ -552,7 +575,17 @@ function UserManagementPage() {
               />
             </div>
             <div className="sm:col-span-2">
-              <Label htmlFor="full_name">Full name (optional)</Label>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="mt-1.5"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Label htmlFor="full_name">Full name</Label>
               <Input
                 id="full_name"
                 value={form.full_name}
@@ -592,7 +625,7 @@ function UserManagementPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {SECTION_ROLES.map((r) => (
+                  {roleChoices.map((r) => (
                     <SelectItem key={r.value} value={r.value}>
                       {r.label} · {r.hint}
                     </SelectItem>
@@ -600,7 +633,23 @@ function UserManagementPage() {
                 </SelectContent>
               </Select>
             </div>
-            {form.id ? (
+            <div>
+              <Label htmlFor="department">Department</Label>
+              <Select value={form.department || "none"} onValueChange={(v) => setForm({ ...form, department: v === "none" ? "" : v })}>
+                <SelectTrigger id="department" className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Not set</SelectItem>
+                  {Array.from(new Set([...DEPARTMENTS, ...(form.department ? [form.department] : [])])).map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {true ? (
               <div>
                 <Label htmlFor="status">Status</Label>
                 <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
