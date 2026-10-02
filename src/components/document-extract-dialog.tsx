@@ -26,8 +26,8 @@ export function DocumentExtractDialog() {
 
   const onFile = async (file: File | undefined) => {
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) return toast.error("File must be under 10 MB.");
-    if (!/^image\/|application\/pdf/.test(file.type)) return toast.error("Upload an image or PDF.");
+    if (file.size > 10 * 1024 * 1024) { toast.error("File must be under 10 MB."); return; }
+    if (!/^image\/|application\/pdf/.test(file.type)) { toast.error("Upload an image or PDF."); return; }
     setBusy(true);
     setMeta(null);
     try {
@@ -38,7 +38,7 @@ export function DocumentExtractDialog() {
         r.readAsDataURL(file);
       });
       const result = await extract({ data: { fileName: file.name, mimeType: file.type, dataUrl } });
-      if (!result.ok) return toast.error(result.error);
+      if (!result.ok) { toast.error(result.error); return; }
       const m = result.data;
       setMeta(m);
       setForm({
@@ -58,7 +58,7 @@ export function DocumentExtractDialog() {
   };
 
   const save = async () => {
-    if (!form.document_code.trim() || !form.title.trim()) return toast.error("Document ID and title are required.");
+    if (!form.document_code.trim() || !form.title.trim()) { toast.error("Document ID and title are required."); return; }
     setSaving(true);
     const { error } = await supabase.from("documents").insert({
       ...form,
@@ -67,7 +67,7 @@ export function DocumentExtractDialog() {
       status: "Active",
     });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     await logAudit("Created", "Document", form.document_code, "Indexed via text extraction");
     toast.success("Document indexed");
     qc.invalidateQueries();
