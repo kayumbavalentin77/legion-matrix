@@ -58,7 +58,7 @@ const GROUPS: Group[] = [
     label: "Administration",
     adminOnly: true,
     items: [
-      { title: "Manage Users", url: "/users", icon: Users },
+      { title: "User Management", url: "/admin/users", icon: Users },
       { title: "Audit Log", url: "/audit-log", icon: ScrollText },
       { title: "Settings", url: "/settings", icon: Settings },
     ],
@@ -120,10 +120,10 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const { can, isSuperAdmin } = useAuthState();
+  const { can, isUserAdmin } = useAuthState();
 
   const visible = GROUPS.filter((group) => {
-    if (group.adminOnly) return isSuperAdmin;
+    if (group.adminOnly) return isUserAdmin;
     if (!group.sections) return true;
     return can(group.sections);
   });
