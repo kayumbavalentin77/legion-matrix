@@ -2,12 +2,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "super_admin" | "s1" | "s2" | "s3" | "viewer";
+export type AppRole = "super_admin" | "administrator" | "s1" | "s2" | "s3" | "viewer";
 
 export type Section = "s1" | "s2" | "s3";
 
 export const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin",
+  administrator: "Administrator",
   s1: "S1 · Personnel & Equipment",
   s2: "S2 · Intelligence",
   s3: "S3 · Operations",
@@ -53,6 +54,7 @@ export function useAuthState() {
 
   const roles = query.data?.roles ?? [];
   const isSuperAdmin = roles.includes("super_admin");
+  const isUserAdmin = isSuperAdmin || roles.includes("administrator");
   const primaryRole: AppRole = isSuperAdmin ? "super_admin" : (roles[0] ?? "viewer");
 
   const can = (sections: Section[]) =>
@@ -67,6 +69,7 @@ export function useAuthState() {
     roleLabel: ROLE_LABELS[primaryRole] ?? "Unassigned",
     isSuperAdmin,
     isAdmin: isSuperAdmin,
+    isUserAdmin,
     can,
     canWrite: isSuperAdmin || roles.some((r) => r !== "viewer"),
     canMedical: isSuperAdmin || roles.includes("s1"),

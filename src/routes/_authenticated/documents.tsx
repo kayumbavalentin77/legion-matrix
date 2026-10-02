@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { DocumentExtractDialog } from "@/components/document-extract-dialog";
 import { ResourcePage } from "@/components/resource-page";
 import { sel, useSoldierOptions, useUnitOptions, useVehicleOptions, RANKS } from "@/lib/options";
 import { formatDate } from "@/lib/data";
@@ -56,7 +57,7 @@ function DocumentsPage() {
         { key: "classification", label: "Classification", options: ["Public", "Internal", "Confidential", "Restricted"] },
         { key: "status", label: "Status", options: ["Active", "Archived"] },
       ]}
-      
+      toolbar={<DocumentExtractDialog />}
     />
   );
 }
