@@ -351,6 +351,8 @@ export const deleteAccount = createServerFn({ method: "POST" })
     const { data: p } = await ctx.admin.from("profiles").select("username").eq("id", data.id).maybeSingle();
     const { error } = await ctx.admin.auth.admin.deleteUser(data.id);
     if (error) throw new Error(error.message);
+    await ctx.admin.from("user_roles").delete().eq("user_id", data.id);
+    await ctx.admin.from("profiles").delete().eq("id", data.id);
     await audit(ctx, context.userId, "Deleted", data.id, `Deleted account ${p?.username ?? data.id}`);
     return { ok: true as const };
   });
