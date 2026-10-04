@@ -1,30 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Loader2, MapPin, Plus, Trash2 } from "lucide-react";
+import { Loader2, MapPin, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
+import { CoordinateFormDialog } from "@/components/coordinate-form-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -36,7 +29,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { logAudit } from "@/lib/data";
 import { useAuthState } from "@/lib/auth";
-import { haversineKm, parseCoordinate, toDms, useBaseLocation } from "@/lib/geo";
+import { haversineKm, toDms, useBaseLocation } from "@/lib/geo";
+import { useCoordinates, type Coordinate } from "@/lib/coordinates";
 
 export const Route = createFileRoute("/_authenticated/coordinates")({
   head: () => ({
@@ -50,80 +44,15 @@ export const Route = createFileRoute("/_authenticated/coordinates")({
   component: CoordinatesPage,
 });
 
-const CATEGORIES = ["Unit", "Checkpoint", "Facility", "Waypoint", "Observation Post", "Other"];
-const CLASSIFICATIONS = ["Unclassified", "Restricted", "Confidential", "Secret"];
-
-const EMPTY = {
-  name: "",
-  category: "Waypoint",
-  classification: "Restricted",
-  latitude: "",
-  longitude: "",
-  place_name: "",
-  description: "",
-};
-
 function CoordinatesPage() {
   const base = useBaseLocation();
   const qc = useQueryClient();
   const { canWrite } = useAuthState();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ ...EMPTY });
+  const [editing, setEditing] = useState<Coordinate | null>(null);
+  const [deleting, setDeleting] = useState<Coordinate | null>(null);
 
-  const lat = parseCoordinate(form.latitude, "lat");
-  const lng = parseCoordinate(form.longitude, "lng");
-  const preview =
-    lat !== null && lng !== null
-      ? {
-          dmsLat: toDms(lat, "lat"),
-          dmsLng: toDms(lng, "lng"),
-          distance: haversineKm(base, { lat, lng }),
-        }
-      : null;
-
-  const { data: rows = [] } = useQuery({
-    queryKey: ["gps_coordinates"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("gps_coordinates")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const save = useMutation({
-    mutationFn: async () => {
-      if (!form.name.trim()) throw new Error("Give the location a name.");
-      if (lat === null || lng === null) throw new Error("Enter valid coordinates, e.g. 01°56'38.8\"S.");
-      const { data, error } = await supabase
-        .from("gps_coordinates")
-        .insert({
-          name: form.name.trim(),
-          category: form.category,
-          classification: form.classification,
-          latitude: lat,
-          longitude: lng,
-          dms_latitude: toDms(lat, "lat"),
-          dms_longitude: toDms(lng, "lng"),
-          place_name: form.place_name.trim() || null,
-          description: form.description.trim() || null,
-          distance_km: haversineKm(base, { lat, lng }),
-        })
-        .select("id")
-        .single();
-      if (error) throw error;
-      await logAudit("Created", "GPS Coordinates", data?.id, `Saved coordinate ${form.name}`);
-    },
-    onSuccess: () => {
-      toast.success("Coordinate saved");
-      setForm({ ...EMPTY });
-      setOpen(false);
-      qc.invalidateQueries({ queryKey: ["gps_coordinates"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const { data: rows = [] } = useCoordinates();
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -133,6 +62,7 @@ function CoordinatesPage() {
     },
     onSuccess: () => {
       toast.success("Coordinate removed");
+      setDeleting(null);
       qc.invalidateQueries({ queryKey: ["gps_coordinates"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -142,10 +72,16 @@ function CoordinatesPage() {
     <div className="space-y-6">
       <PageHeader
         title="GPS Coordinates"
-        description={`Degrees-minutes-seconds or decimal input. Distances measured from ${base.name}.`}
+        description={`Degrees-minutes-seconds or decimal input. Distances measured from ${base.name}. Saved coordinates appear automatically on the Mission Map.`}
         actions={
           canWrite ? (
-            <Button size="sm" onClick={() => setOpen(true)}>
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditing(null);
+                setOpen(true);
+              }}
+            >
               <Plus className="mr-2 h-4 w-4" /> Add coordinate
             </Button>
           ) : null
@@ -192,14 +128,27 @@ function CoordinatesPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     {canWrite ? (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => remove.mutate(row.id)}
-                        aria-label="Delete coordinate"
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setEditing(row);
+                            setOpen(true);
+                          }}
+                          aria-label="Edit coordinate"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDeleting(row)}
+                          aria-label="Delete coordinate"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                     ) : null}
                   </TableCell>
                 </TableRow>
@@ -216,122 +165,28 @@ function CoordinatesPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Add coordinate</DialogTitle>
-            <DialogDescription>
-              Enter DMS (01°56&apos;38.8&quot;S) or decimal degrees (-1.944). Both formats are stored.
-            </DialogDescription>
-          </DialogHeader>
+      <CoordinateFormDialog open={open} onOpenChange={setOpen} editing={editing} />
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <Label htmlFor="name">Location name</Label>
-              <Input
-                id="name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="lat">Latitude</Label>
-              <Input
-                id="lat"
-                value={form.latitude}
-                placeholder={`01°56'38.8"S`}
-                onChange={(e) => setForm({ ...form, latitude: e.target.value })}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="lng">Longitude</Label>
-              <Input
-                id="lng"
-                value={form.longitude}
-                placeholder={`030°03'42.8"E`}
-                onChange={(e) => setForm({ ...form, longitude: e.target.value })}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="category">Category</Label>
-              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                <SelectTrigger id="category" className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="classification">Classification</Label>
-              <Select
-                value={form.classification}
-                onValueChange={(v) => setForm({ ...form, classification: v })}
-              >
-                <SelectTrigger id="classification" className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CLASSIFICATIONS.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="sm:col-span-2">
-              <Label htmlFor="place">Place / district</Label>
-              <Input
-                id="place"
-                value={form.place_name}
-                onChange={(e) => setForm({ ...form, place_name: e.target.value })}
-                className="mt-1.5"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <Label htmlFor="description">Notes</Label>
-              <Textarea
-                id="description"
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="mt-1.5"
-              />
-            </div>
-          </div>
-
-          {preview ? (
-            <div className="rounded-md border bg-muted/40 px-3 py-2 text-sm">
-              <p className="font-medium tabular-nums">
-                {preview.dmsLat} · {preview.dmsLng}
-              </p>
-              <p className="text-muted-foreground">
-                {preview.distance.toLocaleString()} km from {base.name}
-              </p>
-            </div>
-          ) : form.latitude || form.longitude ? (
-            <p className="text-sm text-destructive">Coordinates not recognised yet.</p>
-          ) : null}
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={() => save.mutate()} disabled={save.isPending}>
-              {save.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Save coordinate
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete coordinate?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes &quot;{deleting?.name}&quot; from GPS Coordinates and the Mission Map.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleting && remove.mutate(deleting.id)}
+              disabled={remove.isPending}
+            >
+              {remove.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
