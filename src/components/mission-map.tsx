@@ -11,7 +11,7 @@ function markerIcon(category: string) {
   const { color, symbol } = categoryStyle(category);
   return L.divIcon({
     className: "",
-    html: `<div style="background:${color};color:#fff;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);border-radius:9999px;min-width:30px;height:30px;padding:0 6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.02em;">${symbol}</div>`,
+    html: `<div style="pointer-events:none;background:${color};color:#fff;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);border-radius:9999px;min-width:30px;height:30px;padding:0 6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.02em;">${symbol}</div>`,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     popupAnchor: [0, -16],
