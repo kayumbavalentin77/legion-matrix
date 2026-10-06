@@ -550,31 +550,43 @@ export type Database = {
       }
       inventory_transactions: {
         Row: {
+          balance_after: number | null
           created_at: string
+          created_by: string | null
           id: string
           inventory_id: string | null
           notes: string | null
           performed_by: string | null
           quantity: number
+          transaction_date: string
           transaction_type: string
+          unit: string | null
         }
         Insert: {
+          balance_after?: number | null
           created_at?: string
+          created_by?: string | null
           id?: string
           inventory_id?: string | null
           notes?: string | null
           performed_by?: string | null
           quantity: number
+          transaction_date?: string
           transaction_type: string
+          unit?: string | null
         }
         Update: {
+          balance_after?: number | null
           created_at?: string
+          created_by?: string | null
           id?: string
           inventory_id?: string | null
           notes?: string | null
           performed_by?: string | null
           quantity?: number
+          transaction_date?: string
           transaction_type?: string
+          unit?: string | null
         }
         Relationships: [
           {
@@ -1423,6 +1435,16 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       is_user_admin: { Args: never; Returns: boolean }
+      record_inventory_transaction: {
+        Args: {
+          _date: string
+          _inventory_id: string
+          _quantity: number
+          _remarks: string
+          _type: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       app_role:
