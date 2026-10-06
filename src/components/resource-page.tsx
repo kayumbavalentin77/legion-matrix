@@ -88,6 +88,8 @@ export function ResourcePage({
   baseFilter,
   toolbar,
   emptyHint,
+  rowActions,
+  onView,
 }: {
   title: string;
   description?: string | undefined;
@@ -102,6 +104,8 @@ export function ResourcePage({
   baseFilter?: Record<string, string> | undefined;
   toolbar?: ReactNode | undefined;
   emptyHint?: string | undefined;
+  rowActions?: ((row: Row) => ReactNode) | undefined;
+  onView?: ((row: Row) => void) | undefined;
 }) {
   const { data: rows, isLoading, error } = useRows(table, select, orderBy);
   const save = useSaveRow(table, module);
@@ -322,9 +326,10 @@ export function ResourcePage({
                       ))}
                       <TableCell className="text-right no-print">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => setViewing(row)} aria-label="View">
+                          <Button variant="ghost" size="icon" onClick={() => (onView ? onView(row) : setViewing(row))} aria-label="View">
                             <Eye className="h-4 w-4" />
                           </Button>
+                          {rowActions ? rowActions(row) : null}
                           {canWrite ? (
                             <>
                               <Button variant="ghost" size="icon" onClick={() => setEditing(row)} aria-label="Edit">
