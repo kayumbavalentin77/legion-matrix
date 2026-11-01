@@ -97,7 +97,7 @@ export default function MissionMap({
   onSelect: (c: Coordinate) => void;
 }) {
   const center: [number, number] = points.length
-    ? [points[0]!.latitude, points[0]!.longitude]
+    ? [points[0]?.latitude ?? -1.9441, points[0]?.longitude ?? 30.0619]
     : [-1.9441, 30.0619];
 
   const icons = useMemo(() => {
