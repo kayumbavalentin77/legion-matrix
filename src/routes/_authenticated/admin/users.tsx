@@ -118,7 +118,6 @@ const SECTION_ROLES = [
   { value: "viewer", label: "Unassigned", hint: "No section access" },
 ];
 const ADMIN_ROLE = { value: "administrator", label: "Administrator", hint: "User management" };
-const DEPARTMENTS = ["Personnel (S1)", "Intelligence (S2)", "Operations (S3)", "Logistics", "Medical", "Headquarters"];
 
 const ROLE_BADGE: Record<string, string> = {
   s1: "bg-chart-1/15 text-chart-1 border-chart-1/30",
