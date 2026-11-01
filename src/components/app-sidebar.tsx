@@ -111,6 +111,7 @@ const GROUPS: Group[] = [
       { title: "Mission Files", url: "/mission-files", icon: FolderOpen },
       { title: "Documents", url: "/documents", icon: Files },
       { title: "Mission Map", url: "/map", icon: MapIcon },
+      { title: "LCPP · Logistics Routes", url: "/lcpp", icon: Navigation },
       { title: "GPS Coordinates", url: "/coordinates", icon: Navigation },
     ],
   },
