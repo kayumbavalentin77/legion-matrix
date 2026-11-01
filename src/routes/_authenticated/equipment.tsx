@@ -48,7 +48,7 @@ function EquipmentPage() {
         { name: "serial_number", label: "Serial Number" },
         { name: "quantity", label: "Quantity", type: "number" as const },
         { name: "condition", label: "Condition", type: "select" as const, options: sel(["Good", "Fair", "Poor", "Damaged"]) },
-        { name: "unit_id", label: "Location / Unit", type: "select" as const, options: units },
+        { name: "unit_id", label: "Location / Unit", type: "unit" as const },
         { name: "assigned_to", label: "Assigned To", type: "select" as const, options: soldiers },
         { name: "date_acquired", label: "Date Acquired", type: "date" as const },
         { name: "status", label: "Status", type: "select" as const, options: sel(["Available", "Issued", "Under Maintenance", "Damaged", "Lost", "Retired"]) },

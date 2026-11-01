@@ -42,7 +42,7 @@ function OperationsPage() {
       fields={[
         { name: "reference_number", label: "Reference Number", required: true },
         { name: "title", label: "Title", required: true },
-        { name: "unit_id", label: "Unit", type: "select" as const, options: units },
+        { name: "unit_id", label: "Unit", type: "unit" as const },
         { name: "responsible_officer", label: "Responsible Officer" },
         { name: "start_date", label: "Start Date", type: "date" as const },
         { name: "end_date", label: "End Date", type: "date" as const },

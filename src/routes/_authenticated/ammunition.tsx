@@ -46,7 +46,7 @@ function AmmoPage() {
         { name: "type", label: "Type", required: true },
         { name: "batch_number", label: "Batch Number" },
         { name: "quantity", label: "Quantity", type: "number" as const },
-        { name: "unit_id", label: "Unit", type: "select" as const, options: units },
+        { name: "unit_id", label: "Unit", type: "unit" as const },
         { name: "storage_location", label: "Storage Location" },
         { name: "condition", label: "Condition", type: "select" as const, options: sel(["Serviceable", "Inspection Due", "Unserviceable"]) },
         { name: "inspection_date", label: "Inspection Date", type: "date" as const },
