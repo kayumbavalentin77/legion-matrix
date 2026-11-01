@@ -24,6 +24,7 @@ import { Route as AuthenticatedFitnessRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
 import { Route as AuthenticatedIntelligenceFilesRouteImport } from './routes/_authenticated/intelligence-files'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
+import { Route as AuthenticatedLcppRouteImport } from './routes/_authenticated/lcpp'
 import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
 import { Route as AuthenticatedMedicalRouteImport } from './routes/_authenticated/medical'
 import { Route as AuthenticatedMissionFilesRouteImport } from './routes/_authenticated/mission-files'
@@ -117,6 +118,11 @@ const AuthenticatedIntelligenceFilesRoute =
 const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLcppRoute = AuthenticatedLcppRouteImport.update({
+  id: '/lcpp',
+  path: '/lcpp',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
@@ -227,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof AuthenticatedHelpRoute
   '/intelligence-files': typeof AuthenticatedIntelligenceFilesRoute
   '/inventory': typeof AuthenticatedInventoryRoute
+  '/lcpp': typeof AuthenticatedLcppRoute
   '/map': typeof AuthenticatedMapRoute
   '/medical': typeof AuthenticatedMedicalRoute
   '/mission-files': typeof AuthenticatedMissionFilesRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/help': typeof AuthenticatedHelpRoute
   '/intelligence-files': typeof AuthenticatedIntelligenceFilesRoute
   '/inventory': typeof AuthenticatedInventoryRoute
+  '/lcpp': typeof AuthenticatedLcppRoute
   '/map': typeof AuthenticatedMapRoute
   '/medical': typeof AuthenticatedMedicalRoute
   '/mission-files': typeof AuthenticatedMissionFilesRoute
@@ -295,6 +303,7 @@ export interface FileRoutesById {
   '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/intelligence-files': typeof AuthenticatedIntelligenceFilesRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
+  '/_authenticated/lcpp': typeof AuthenticatedLcppRoute
   '/_authenticated/map': typeof AuthenticatedMapRoute
   '/_authenticated/medical': typeof AuthenticatedMedicalRoute
   '/_authenticated/mission-files': typeof AuthenticatedMissionFilesRoute
@@ -330,6 +339,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/intelligence-files'
     | '/inventory'
+    | '/lcpp'
     | '/map'
     | '/medical'
     | '/mission-files'
@@ -363,6 +373,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/intelligence-files'
     | '/inventory'
+    | '/lcpp'
     | '/map'
     | '/medical'
     | '/mission-files'
@@ -397,6 +408,7 @@ export interface FileRouteTypes {
     | '/_authenticated/help'
     | '/_authenticated/intelligence-files'
     | '/_authenticated/inventory'
+    | '/_authenticated/lcpp'
     | '/_authenticated/map'
     | '/_authenticated/medical'
     | '/_authenticated/mission-files'
@@ -528,6 +540,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/inventory'
       preLoaderRoute: typeof AuthenticatedInventoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lcpp': {
+      id: '/_authenticated/lcpp'
+      path: '/lcpp'
+      fullPath: '/lcpp'
+      preLoaderRoute: typeof AuthenticatedLcppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/map': {
@@ -664,6 +683,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedIntelligenceFilesRoute: typeof AuthenticatedIntelligenceFilesRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
+  AuthenticatedLcppRoute: typeof AuthenticatedLcppRoute
   AuthenticatedMapRoute: typeof AuthenticatedMapRoute
   AuthenticatedMedicalRoute: typeof AuthenticatedMedicalRoute
   AuthenticatedMissionFilesRoute: typeof AuthenticatedMissionFilesRoute
@@ -695,6 +715,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedIntelligenceFilesRoute: AuthenticatedIntelligenceFilesRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
+  AuthenticatedLcppRoute: AuthenticatedLcppRoute,
   AuthenticatedMapRoute: AuthenticatedMapRoute,
   AuthenticatedMedicalRoute: AuthenticatedMedicalRoute,
   AuthenticatedMissionFilesRoute: AuthenticatedMissionFilesRoute,

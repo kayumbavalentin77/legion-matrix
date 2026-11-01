@@ -1,6 +1,6 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 
 import { categoryStyle, type Coordinate } from "@/lib/coordinates";
@@ -83,6 +83,7 @@ export default function MissionMap({
   onPick,
   onMeasure,
   onSelect,
+  children,
 }: {
   points: Coordinate[];
   measurePath: MeasurePoint[];
@@ -95,9 +96,10 @@ export default function MissionMap({
   onPick: (p: MeasurePoint) => void;
   onMeasure: (p: MeasurePoint) => void;
   onSelect: (c: Coordinate) => void;
+  children?: ReactNode;
 }) {
   const center: [number, number] = points.length
-    ? [points[0]!.latitude, points[0]!.longitude]
+    ? [points[0]?.latitude ?? -1.9441, points[0]?.longitude ?? 30.0619]
     : [-1.9441, 30.0619];
 
   const icons = useMemo(() => {
@@ -114,6 +116,7 @@ export default function MissionMap({
         className="h-full w-full"
         style={{ cursor: picking || measuring ? "crosshair" : undefined }}
       >
+        {children}
         {satellite ? (
           <TileLayer
             attribution="Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"

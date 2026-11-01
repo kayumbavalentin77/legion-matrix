@@ -13,3 +13,5 @@
 - User administration runs only in `createServerFn` handlers in `src/lib/account.functions.ts`, which check the caller's super_admin/administrator role via the service client before acting — RLS and route guards are UX, the server check is the boundary.
 - Users sign in with a username; the email is resolved server-side in `loginWithUsername` so emails are never exposed to anonymous callers.
 - Super Admin accounts cannot be modified through the management UI; only Super Admins can grant or manage the Administrator role.
+- LCPP reuses MissionMap through its optional map-layer children; public OSRM road alternatives and configurable logistics estimates remain isolated in a browser-safe service, preserving Mission Map behavior.
+- LCPP snapshots use the existing per-user search_presets JSON config under the lcpp module, preserving existing storage permissions and avoiding duplicate tables.
