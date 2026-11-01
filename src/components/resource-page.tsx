@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Bookmark, BookmarkPlus, Download, Pencil, Plus, Printer, Search, Trash2, Inbox, Eye, X } from "lucide-react";
 
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -599,7 +600,7 @@ export function RecordDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => void submit().catch((e: Error) => setErrors({ _form: e.message }))} disabled={saving}>
+          <Button onClick={() => void submit().catch((e: Error) => toast.error(e.message))} disabled={saving}>
             {saving ? "Saving…" : "Save record"}
           </Button>
         </DialogFooter>
