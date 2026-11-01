@@ -48,7 +48,7 @@ function VehiclesPage() {
         { name: "model", label: "Model" },
         { name: "manufacturer", label: "Manufacturer" },
         { name: "year", label: "Year", type: "number" as const },
-        { name: "unit_id", label: "Unit", type: "select" as const, options: units },
+        { name: "unit_id", label: "Unit", type: "unit" as const },
         { name: "driver", label: "Driver" },
         { name: "status", label: "Status", type: "select" as const, options: sel(["Operational", "Maintenance", "Out of Service", "Reserved"]) },
       ]}

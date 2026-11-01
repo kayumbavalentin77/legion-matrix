@@ -118,7 +118,6 @@ const SECTION_ROLES = [
   { value: "viewer", label: "Unassigned", hint: "No section access" },
 ];
 const ADMIN_ROLE = { value: "administrator", label: "Administrator", hint: "User management" };
-const DEPARTMENTS = ["Personnel (S1)", "Intelligence (S2)", "Operations (S3)", "Logistics", "Medical", "Headquarters"];
 
 const ROLE_BADGE: Record<string, string> = {
   s1: "bg-chart-1/15 text-chart-1 border-chart-1/30",
@@ -635,19 +634,14 @@ function UserManagementPage() {
             </div>
             <div>
               <Label htmlFor="department">Department</Label>
-              <Select value={form.department || "none"} onValueChange={(v) => setForm({ ...form, department: v === "none" ? "" : v })}>
-                <SelectTrigger id="department" className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Not set</SelectItem>
-                  {Array.from(new Set([...DEPARTMENTS, ...(form.department ? [form.department] : [])])).map((d) => (
-                    <SelectItem key={d} value={d}>
-                      {d}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="department"
+                className="mt-1.5"
+                maxLength={120}
+                placeholder="Type a department"
+                value={form.department}
+                onChange={(e) => setForm({ ...form, department: e.target.value })}
+              />
             </div>
             {true ? (
               <div>

@@ -1,6 +1,8 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Bookmark, BookmarkPlus, Download, Pencil, Plus, Printer, Search, Trash2, Inbox, Eye, X } from "lucide-react";
 
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -57,7 +59,7 @@ import { exportCsv, formatDate, useDeleteRow, useRows, useSaveRow, type Row } fr
 export type Field = {
   name: string;
   label: string;
-  type?: "text" | "number" | "date" | "textarea" | "select" | "email";
+  type?: "text" | "number" | "date" | "textarea" | "select" | "email" | "unit";
   options?: { value: string; label: string }[];
   required?: boolean;
   full?: boolean;
@@ -494,6 +496,7 @@ export function RecordDialog({
 }) {
   const [values, setValues] = useState<Row>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [unitDraft, setUnitDraft] = useState<Record<string, string>>({});
   const [key, setKey] = useState(0);
 
   // Reset local state whenever a different record is opened.
@@ -502,16 +505,19 @@ export function RecordDialog({
   if (open && seenId !== initialId) {
     setSeenId(initialId);
     setValues(initial);
+    setUnitDraft({});
     setErrors({});
     setKey((k) => k + 1);
   }
 
   const set = (name: string, value: unknown) => setValues((prev) => ({ ...prev, [name]: value }));
 
-  const submit = () => {
+  const unitText = (f: Field) =>
+    f.name in unitDraft ? (unitDraft[f.name] ?? "") : ((initial["units"] as { name?: string } | null)?.name ?? "");
+  const submit = async () => {
     const next: Record<string, string> = {};
     for (const f of fields) {
-      const v = values[f.name];
+      const v = f.type === "unit" ? unitText(f) : values[f.name];
       if (f.required && (v === undefined || v === null || String(v).trim() === "")) {
         next[f.name] = `${f.label} is required`;
       }
@@ -524,6 +530,7 @@ export function RecordDialog({
       let v = values[f.name];
       if (v === "" || v === undefined) v = null;
       if (f.type === "number" && v !== null) v = Number(v);
+      if (f.type === "unit") v = await resolveUnitId(unitText(f));
       payload[f.name] = v;
     }
     onSubmit(payload);
@@ -550,6 +557,14 @@ export function RecordDialog({
                     value={String(values[f.name] ?? "")}
                     maxLength={2000}
                     onChange={(e) => set(f.name, e.target.value)}
+                  />
+                ) : f.type === "unit" ? (
+                  <Input
+                    id={f.name}
+                    maxLength={120}
+                    placeholder="Type a unit"
+                    value={unitText(f)}
+                    onChange={(e) => setUnitDraft((d) => ({ ...d, [f.name]: e.target.value }))}
                   />
                 ) : f.type === "select" ? (
                   <Select
@@ -585,11 +600,22 @@ export function RecordDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={submit} disabled={saving}>
+          <Button onClick={() => void submit().catch((e: Error) => toast.error(e.message))} disabled={saving}>
             {saving ? "Saving…" : "Save record"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
+}
+
+/** Finds a unit by name (case-insensitive) or creates it, so units can be typed freely. */
+async function resolveUnitId(name: string): Promise<string | null> {
+  const n = name.trim();
+  if (!n) return null;
+  const { data: found } = await supabase.from("units").select("id").ilike("name", n.replace(/[%_\\]/g, "\\$&")).limit(1);
+  if (found?.[0]) return found[0].id;
+  const { data, error } = await supabase.from("units").insert({ name: n }).select("id").single();
+  if (error) throw new Error(error.message);
+  return data.id;
 }

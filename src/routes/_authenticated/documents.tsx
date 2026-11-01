@@ -46,7 +46,7 @@ function DocumentsPage() {
         { name: "title", label: "Title", required: true },
         { name: "category", label: "Category" },
         { name: "author", label: "Author" },
-        { name: "unit_id", label: "Unit", type: "select" as const, options: units },
+        { name: "unit_id", label: "Unit", type: "unit" as const },
         { name: "document_date", label: "Date", type: "date" as const },
         { name: "classification", label: "Classification", type: "select" as const, options: sel(["Public", "Internal", "Confidential", "Restricted"]) },
         { name: "status", label: "Status", type: "select" as const, options: sel(["Active", "Archived"]) },

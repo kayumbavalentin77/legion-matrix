@@ -45,7 +45,7 @@ function SoldiersPage() {
         { name: "service_number", label: "Service Number", required: true },
         { name: "full_name", label: "Full Name", required: true },
         { name: "rank", label: "Rank", type: "select" as const, options: sel(RANKS), required: true },
-        { name: "unit_id", label: "Unit", type: "select" as const, options: units },
+        { name: "unit_id", label: "Unit", type: "unit" as const },
         { name: "gender", label: "Gender", type: "select" as const, options: sel(["Male", "Female"]) },
         { name: "date_of_birth", label: "Date of Birth", type: "date" as const },
         { name: "nationality", label: "Nationality" },

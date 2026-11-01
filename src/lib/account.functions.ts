@@ -356,3 +356,25 @@ export const deleteAccount = createServerFn({ method: "POST" })
     await audit(ctx, context.userId, "Deleted", data.id, `Deleted account ${p?.username ?? data.id}`);
     return { ok: true as const };
   });
+
+/** Super Admin updates their own username/email. */
+export const updateOwnAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ username: usernameSchema, email: z.string().trim().email().max(255) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const ctx = await assertUserAdmin(context.userId);
+    if (!ctx.isSuper) throw new Error("Only a Super Admin can change their own login details here.");
+    if (await usernameTaken(ctx, data.username, context.userId)) throw new Error("That username is already taken.");
+    if (await emailTaken(ctx, data.email, context.userId)) throw new Error("That email is already registered.");
+    const { data: before } = await ctx.admin.from("profiles").select("email, username").eq("id", context.userId).maybeSingle();
+    if (before?.email?.toLowerCase() !== data.email.toLowerCase()) {
+      const { error } = await ctx.admin.auth.admin.updateUserById(context.userId, { email: data.email, email_confirm: true });
+      if (error) throw new Error(error.message);
+    }
+    const { error } = await ctx.admin.from("profiles").update({ username: data.username, email: data.email }).eq("id", context.userId);
+    if (error) throw new Error(error.message);
+    await audit(ctx, context.userId, "Updated own account", context.userId, `Login details changed (${before?.username ?? ""} → ${data.username})`);
+    return { ok: true as const };
+  });
