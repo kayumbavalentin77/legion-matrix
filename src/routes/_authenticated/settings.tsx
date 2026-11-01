@@ -66,7 +66,10 @@ function SettingsPage() {
 
   const onSave = async () => {
     const parsed = schema.safeParse(form);
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Invalid input");
+      return;
+    }
     setBusy(true);
     try {
       await save({ data: parsed.data });
