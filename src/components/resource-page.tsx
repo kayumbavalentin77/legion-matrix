@@ -513,7 +513,7 @@ export function RecordDialog({
   const set = (name: string, value: unknown) => setValues((prev) => ({ ...prev, [name]: value }));
 
   const unitText = (f: Field) =>
-    f.name in unitDraft ? unitDraft[f.name] : ((initial["units"] as { name?: string } | null)?.name ?? "");
+    f.name in unitDraft ? (unitDraft[f.name] ?? "") : ((initial["units"] as { name?: string } | null)?.name ?? "");
   const submit = async () => {
     const next: Record<string, string> = {};
     for (const f of fields) {
