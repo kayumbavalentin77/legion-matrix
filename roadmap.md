@@ -7,3 +7,4 @@
 - [ ] Add print preview and A4/A3/A2 portrait/landscape PDF export of selected areas.
 - [ ] Save analyses and print reports using existing facilities.
 - [ ] Verify calculations and signed-in browser flow; preserve Mission Map.
+- [ ] Fix all publishing-blocking build errors and confirm a clean build.

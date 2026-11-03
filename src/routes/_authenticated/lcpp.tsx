@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeftRight, Crosshair, Layers, Loader2, Maximize2, Navigation, Printer, Save, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
@@ -13,24 +13,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useCoordinates, geocodePlace, type Coordinate, type GeocodeResult } from "@/lib/coordinates";
 import { useAuthState } from "@/lib/auth";
 import { usePresets } from "@/lib/presets";
-import { estimatedCost, fetchRoadRoutes, rankRoutes, ROUTING_SOURCE, type CostInputs, type LogisticsAnalysis, type RoutePoint } from "@/lib/lcpp";
+import { fetchRoadRoutes, rankRoutes, ROUTING_SOURCE, type LogisticsAnalysis, type RoutePoint } from "@/lib/lcpp";
 
-const MissionMap = lazy(() => import("@/components/mission-map"));
-const RouteLayer = lazy(() => import("@/components/logistics-route-layer"));
+const LcppMap = lazy(() => import("@/components/lcpp-map"));
+import { MapPreparationPanel } from "@/components/map-preparation-panel";
+import type { MapTools } from "@/components/map-preparation-layer";
+import type { MapPoint, MapSheet } from "@/lib/map-preparation";
+
 export const Route = createFileRoute("/_authenticated/lcpp")({
   ssr: false,
   head: () => ({ meta: [
     { title: "LCPP · Logistics Route Comparison | Military Management System" },
-    { name: "description", content: "Compare public road logistics routes, estimated travel time and costs, with saved analyses and printable reports." },
+    { name: "description", content: "Prepare geographic map areas, upload map images and export printable maps; compare estimated road distance and travel time." },
     { property: "og:title", content: "LCPP · Logistics Route Comparison | Military Management System" },
     { property: "og:description", content: "General logistics road-route comparison using OpenStreetMap data and clearly labelled estimates." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }), component: LcppPage,
 });
 
-const defaults: CostInputs = { fuelPer100Km: 0, fuelPrice: 0, hourlyCost: 0, fixedCost: 0 };
+
 const toPoint = (coordinate: Coordinate): RoutePoint => ({ name: coordinate.name, lat: coordinate.latitude, lng: coordinate.longitude });
-const money = (amount: number) => `${Math.round(amount).toLocaleString()} RWF`;
+
 
 function LcppPage() {
   const auth = useAuthState();
@@ -44,8 +47,14 @@ function LcppPage() {
   const [pickTarget, setPickTarget] = useState<"origin" | "destination">("origin");
   const [picking, setPicking] = useState(false);
   const [satellite, setSatellite] = useState(false);
-  const [sort, setSort] = useState("cost");
-  const [costs, setCosts] = useState<CostInputs>(defaults);
+  const [sort, setSort] = useState("distance");
+  const [sheet, setSheet] = useState<MapSheet>({title: "LCPP Map", boundary: [], overlay: null, layer: "street", grid: false, paper: "a4", orientation: "landscape"});
+  const [drawTool,setDrawTool]=useState("none");
+  const [editingBoundary,setEditingBoundary]=useState(false);
+  const [imageUrl,setImageUrl]=useState("");
+  const mapTools=useRef<MapTools|null>(null);
+  const onTools=useCallback((tools:MapTools)=>{mapTools.current=tools;},[]);
+  const onBoundary=useCallback((boundary:MapPoint[])=>{setSheet(previous=>({...previous,boundary}));},[]);
   const [analysis, setAnalysis] = useState<LogisticsAnalysis | null>(null);
   const [selectedId, setSelectedId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -73,9 +82,9 @@ function LcppPage() {
   }, [search]);
   useEffect(() => () => request.current?.abort(), []);
 
-  const routes = useMemo(() => rankRoutes(analysis?.routes ?? [], costs, sort), [analysis, costs, sort]);
+  const routes = useMemo(() => rankRoutes(analysis?.routes ?? [], sort), [analysis, sort]);
   const points = useMemo(() => [origin, destination].flatMap((point, index) => point ? [{ id: `endpoint-${index}`, name: point.name, category: "Waypoint", classification: "Internal", latitude: point.lat, longitude: point.lng, dms_latitude: null, dms_longitude: null, place_name: null, description: null, distance_km: null, created_at: "", updated_at: "" }] : []), [origin, destination]);
-  const costsReady = Object.values(costs).some(value => value > 0);
+
   function choose(point: RoutePoint) {
     request.current?.abort(); setLoading(false);
     if (pickTarget === "origin") { setOrigin(point); setPickTarget("destination"); } else setDestination(point);
@@ -89,7 +98,7 @@ function LcppPage() {
     try {
       const result = await fetchRoadRoutes(origin, destination, controller.signal);
       if (controller.signal.aborted) return;
-      setAnalysis({ origin, destination, routes: result, costs: { ...costs }, retrievedAt: new Date().toISOString() });
+      setAnalysis({ origin, destination, routes: result, retrievedAt: new Date().toISOString() });
       setSelectedId(result[0]?.id ?? ""); setFitSignal(Date.now());
     } catch (e) { if (!controller.signal.aborted) setError(e instanceof Error ? e.message : "Could not compare routes."); }
     finally { if (!controller.signal.aborted) setLoading(false); }
@@ -97,7 +106,7 @@ function LcppPage() {
 
   if (!auth.isLoading && !auth.can(["s3"])) return <PageHeader title="LCPP" description="This module is available in the Operations section." />;
   return <div className="space-y-6 print-area">
-    <PageHeader title="Least-Cost Probable Path (LCPP)" description="General logistics route comparison. Road distances, travel times and costs are estimates." actions={<div className="flex flex-wrap gap-2">
+    <PageHeader title="Least-Cost Probable Path (LCPP)" description="General logistics route comparison. Map images, area selection and topographic preparation. Road distances and travel times are estimates." actions={<div className="flex flex-wrap gap-2">
       <Button size="sm" variant="outline" disabled={!analysis} onClick={() => window.print()}><Printer className="mr-2 h-4 w-4" />Print report</Button>
       <Button size="sm" disabled={!analysis} onClick={() => { setName(""); setSaveOpen(true); }}><Save className="mr-2 h-4 w-4" />Save analysis</Button>
     </div>} />
@@ -112,25 +121,28 @@ function LcppPage() {
             {geoResults.map((r, index) => <Button key={index} variant="ghost" className="h-auto w-full justify-start whitespace-normal py-2 text-left" onClick={() => choose({name: r.label, lat: r.lat, lng: r.lng})}>{r.label}</Button>)}
           </div>}
         </div>
-        <Select value={sort} onValueChange={setSort}><SelectTrigger aria-label="Compare by" className="md:w-56"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="cost">Lowest estimated cost</SelectItem><SelectItem value="distance">Shortest distance</SelectItem><SelectItem value="time">Fastest estimated time</SelectItem></SelectContent></Select>
+        <Select value={sort} onValueChange={setSort}><SelectTrigger aria-label="Compare by" className="md:w-56"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="distance">Shortest distance</SelectItem><SelectItem value="time">Fastest estimated time</SelectItem></SelectContent></Select>
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" onClick={() => { setSearch(""); setSort("cost"); }}><X className="mr-1 h-4 w-4" />Clear filters</Button>
-          <Button size="sm" variant="outline" onClick={() => setSatellite(!satellite)}><Layers className="mr-1 h-4 w-4" />{satellite ? "Street view" : "Satellite"}</Button>
+          <Button size="sm" variant="outline" onClick={() => { setSearch(""); setSort("distance"); }}><X className="mr-1 h-4 w-4" />Clear filters</Button>
+          <Button size="sm" variant="outline" onClick={() => setSheet({...sheet,layer:sheet.layer === "satellite" ? "street" : "satellite"})}><Layers className="mr-1 h-4 w-4" />{sheet.layer === "satellite" ? "Street view" : "Satellite"}</Button>
           <Button size="sm" variant="outline" onClick={() => { if (!points.length) toast.info("No locations selected."); else setFitSignal(Date.now()); }}><Maximize2 className="mr-1 h-4 w-4" />Fit all markers</Button>
-          <Button size="sm" variant={picking ? "default" : "outline"} onClick={() => setPicking(!picking)}><Crosshair className="mr-1 h-4 w-4" />{picking ? "Cancel map pick" : "Pick from map"}</Button>
+          <Button size="sm" variant={picking ? "default" : "outline"} onClick={() => {setPicking(!picking);setDrawTool("none");}}><Crosshair className="mr-1 h-4 w-4" />{picking ? "Cancel map pick" : "Pick from map"}</Button>
         </div>
+      </div>
+      <div className="flex flex-wrap gap-2 no-print">
+        {(["rectangle","polygon","freehand"] as const).map(tool=><Button key={tool} size="sm" variant={drawTool===tool?"default":"outline"} onClick={()=>{setDrawTool(drawTool===tool?"none":tool);setPicking(false);setEditingBoundary(false);}}>{tool[0]?.toUpperCase()}{tool.slice(1)} selection</Button>)}
+        <Button size="sm" variant="ghost" onClick={()=>setDrawTool("none")}>Stop drawing</Button>
       </div>
       <div className="flex flex-wrap items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm">
         <span className="min-w-0 flex-1 break-words"><strong>From:</strong> {origin?.name ?? "Not selected"} <span className="mx-2">→</span> <strong>To:</strong> {destination?.name ?? "Not selected"}</span>
         <Select value={pickTarget} onValueChange={value => setPickTarget(value === "origin" ? "origin" : "destination")}><SelectTrigger aria-label="Location target" className="w-40 no-print"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="origin">Set origin</SelectItem><SelectItem value="destination">Set destination</SelectItem></SelectContent></Select>
       </div>
       <Suspense fallback={<div className="grid h-[560px] place-items-center text-sm text-muted-foreground">Loading map…</div>}>
-        <MissionMap points={points} measurePath={[]} picking={picking} measuring={false} focus={focus} fitSignal={fitSignal} satellite={satellite} selectedId={null} onPick={point => choose({...point, name: `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`})} onMeasure={() => {}} onSelect={c => setFocus({lat: c.latitude, lng: c.longitude, signal: Date.now()})}>
-          <RouteLayer routes={analysis?.routes ?? []} selectedId={selectedId} fitSignal={fitSignal} onSelect={setSelectedId} />
-        </MissionMap>
+        <LcppMap map={{points,measurePath:[],picking,measuring:false,focus,fitSignal,satellite:sheet.layer === "satellite",selectedId:null,onPick:point=>choose({...point,name:`${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`}),onMeasure:()=>{},onSelect:c=>setFocus({lat:c.latitude,lng:c.longitude,signal:Date.now()})}} preparation={{boundary:sheet.boundary,tool:drawTool,editing:editingBoundary,overlay:sheet.overlay,imageUrl,grid:sheet.grid,layer:sheet.layer,onBoundary,onTools}} routes={{routes:analysis?.routes??[],selectedId,fitSignal,onSelect:setSelectedId}}/>
       </Suspense>
     </CardContent></Card>
-    <div className="grid gap-4 lg:grid-cols-2">
+    <MapPreparationPanel sheet={sheet} onSheet={setSheet} tools={mapTools} editing={editingBoundary} onEditing={setEditingBoundary} imageUrl={imageUrl} onImageUrl={setImageUrl}/>
+    <div>
       <Card><CardHeader><CardTitle className="text-base">Logistics route</CardTitle></CardHeader><CardContent className="space-y-3">
         <div className="grid gap-2 sm:grid-cols-2 no-print">{(["origin", "destination"] as const).map(target => <Select key={target} value={coordinates.find(c => c.latitude === (target === "origin" ? origin : destination)?.lat && c.longitude === (target === "origin" ? origin : destination)?.lng)?.id ?? ""} onValueChange={id => { const c = coordinates.find(c => c.id === id); if (!c) return; request.current?.abort(); setLoading(false); (target === "origin" ? setOrigin : setDestination)(toPoint(c)); setAnalysis(null); }}><SelectTrigger aria-label={target === "origin" ? "From saved coordinate" : "To saved coordinate"}><SelectValue placeholder={target === "origin" ? "From saved coordinate…" : "To saved coordinate…"} /></SelectTrigger><SelectContent>{coordinates.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select>)}</div>
         <div className="flex flex-wrap gap-2 no-print">
@@ -141,21 +153,18 @@ function LcppPage() {
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         <p className="text-xs text-muted-foreground">Source: {ROUTING_SOURCE}. Selected endpoints are sent to the public routing service. No live traffic, road-closure, vehicle-clearance or road-safety verification. Not a terrain-based or tactical path prediction.</p>
       </CardContent></Card>
-      <Card><CardHeader><CardTitle className="text-base">Cost assumptions · RWF</CardTitle></CardHeader><CardContent className="grid gap-3 sm:grid-cols-2">
-        {([{key: "fuelPer100Km", label: "Fuel consumption (L / 100 km)"}, {key: "fuelPrice", label: "Fuel price (RWF / L)"}, {key: "hourlyCost", label: "Operating cost (RWF / hour)"}, {key: "fixedCost", label: "Fixed trip cost (RWF)"}] as const).map(field => <div key={field.key} className="space-y-1"><Label htmlFor={field.key}>{field.label}</Label><Input id={field.key} type="number" min="0" step="any" value={costs[field.key]} onChange={e => { const value = Number(e.target.value); if (Number.isFinite(value) && value >= 0) setCosts({...costs, [field.key]: value}); }} /></div>)}
-        {!costsReady && <p className="text-xs text-muted-foreground sm:col-span-2">Cost comparison awaits your actual operating rates; no prices are assumed.</p>}
-      </CardContent></Card>
+
     </div>
     <Card><CardHeader><CardTitle className="text-base">Route comparison {analysis && <Badge variant="outline" className="ml-2">Estimated</Badge>}</CardTitle></CardHeader><CardContent>
       {!analysis ? <p className="text-sm text-muted-foreground">No analysis available.</p> : <>
-        <p className="mb-3 text-xs text-muted-foreground">Retrieved {new Date(analysis.retrievedAt).toLocaleString()}. {routes.length === 1 ? "Only one road route was returned; no alternatives are invented." : `${routes.length} public road alternatives returned.`} Lowest cost refers only to returned alternatives and entered assumptions.</p>
-        <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="border-b text-muted-foreground"><th className="py-2 pr-4">Route</th><th className="py-2 pr-4">Distance</th><th className="py-2 pr-4">Travel time</th><th className="py-2 pr-4">Estimated cost</th><th className="py-2 no-print">Map</th></tr></thead><tbody>{routes.map((route, index) => <tr key={route.id} className={route.id === selectedId ? "border-b bg-muted/40" : "border-b"}><td className="py-3 pr-4 whitespace-nowrap">Route {route.id.replace("route-", "")} {index === 0 && (sort !== "cost" || costsReady) && <Badge variant="outline">{sort === "cost" ? "Lowest cost" : sort === "time" ? "Fastest" : "Shortest"}</Badge>}</td><td className="py-3 pr-4 tabular-nums whitespace-nowrap">{route.distanceKm.toFixed(2)} km</td><td className="py-3 pr-4 tabular-nums whitespace-nowrap">{Math.ceil(route.durationMinutes)} min</td><td className="py-3 pr-4 tabular-nums whitespace-nowrap">{costsReady ? money(estimatedCost(route, costs)) : "Rates required"}</td><td className="py-3 no-print"><Button size="sm" variant="outline" onClick={() => setSelectedId(route.id)}>View</Button></td></tr>)}</tbody></table></div>
+        <p className="mb-3 text-xs text-muted-foreground">Retrieved {new Date(analysis.retrievedAt).toLocaleString()}. {routes.length === 1 ? "Only one road route was returned; no alternatives are invented." : `${routes.length} public road alternatives returned.`} Only returned road alternatives are compared.</p>
+        <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="border-b text-muted-foreground"><th className="py-2 pr-4">Route</th><th className="py-2 pr-4">Distance</th><th className="py-2 pr-4">Travel time</th><th className="py-2 no-print">Map</th></tr></thead><tbody>{routes.map((route, index) => <tr key={route.id} className={route.id === selectedId ? "border-b bg-muted/40" : "border-b"}><td className="py-3 pr-4 whitespace-nowrap">Route {route.id.replace("route-", "")} {index === 0 && <Badge variant="outline">{sort === "time" ? "Fastest" : "Shortest"}</Badge>}</td><td className="py-3 pr-4 tabular-nums whitespace-nowrap">{route.distanceKm.toFixed(2)} km</td><td className="py-3 pr-4 tabular-nums whitespace-nowrap">{Math.ceil(route.durationMinutes)} min</td><td className="py-3 no-print"><Button size="sm" variant="outline" onClick={() => setSelectedId(route.id)}>View</Button></td></tr>)}</tbody></table></div>
       </>}
     </CardContent></Card>
     <Card className="no-print"><CardHeader><CardTitle className="text-base">Saved analyses</CardTitle></CardHeader><CardContent className="space-y-3">
-      {saved.isLoading ? <p className="text-sm text-muted-foreground">Loading saved analyses…</p> : saved.presets.length === 0 ? <p className="text-sm text-muted-foreground">No saved analyses.</p> : saved.presets.map(preset => <div key={preset.id} className="flex flex-wrap items-center justify-between gap-2 border-b pb-3"><span className="min-w-0 break-words text-sm font-medium">{preset.name}</span><div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => { try { const restored = JSON.parse(preset.config.filters.snapshot ?? "") as LogisticsAnalysis; if (!restored.routes?.length || !restored.origin || !restored.destination) throw new Error(); estimatedCost(restored.routes[0] ?? {id:"",distanceKm:0,durationMinutes:0,path:[]}, restored.costs); request.current?.abort(); setLoading(false); setOrigin(restored.origin); setDestination(restored.destination); setCosts(restored.costs); setAnalysis(restored); setSelectedId(restored.routes[0]?.id ?? ""); setError(""); setFitSignal(Date.now()); } catch { toast.error("This saved analysis could not be opened."); } }}>Open</Button><Button size="icon" variant="ghost" aria-label={`Delete ${preset.name}`} onClick={() => setDeleteId(preset.id)}><Trash2 className="h-4 w-4" /></Button></div></div>)}
+      {saved.isLoading ? <p className="text-sm text-muted-foreground">Loading saved analyses…</p> : saved.presets.length === 0 ? <p className="text-sm text-muted-foreground">No saved analyses.</p> : saved.presets.map(preset => <div key={preset.id} className="flex flex-wrap items-center justify-between gap-2 border-b pb-3"><span className="min-w-0 break-words text-sm font-medium">{preset.name}</span><div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => { try { const restored = JSON.parse(preset.config.filters['snapshot'] ?? "") as LogisticsAnalysis; if (!restored.routes?.length || !restored.origin || !restored.destination) throw new Error();  request.current?.abort(); setLoading(false); setOrigin(restored.origin); setDestination(restored.destination);  setAnalysis(restored); setSelectedId(restored.routes[0]?.id ?? ""); setError(""); setFitSignal(Date.now()); } catch { toast.error("This saved analysis could not be opened."); } }}>Open</Button><Button size="icon" variant="ghost" aria-label={`Delete ${preset.name}`} onClick={() => setDeleteId(preset.id)}><Trash2 className="h-4 w-4" /></Button></div></div>)}
     </CardContent></Card>
-    <Dialog open={saveOpen} onOpenChange={setSaveOpen}><DialogContent><DialogHeader><DialogTitle>Save logistics analysis</DialogTitle></DialogHeader><Label htmlFor="analysis-name">Analysis name</Label><Input id="analysis-name" value={name} onChange={e => setName(e.target.value)} maxLength={100} /><p className="text-xs text-muted-foreground">Saved privately to your account. Reusing a name replaces its previous analysis.</p><DialogFooter><Button variant="outline" onClick={() => setSaveOpen(false)}>Cancel</Button><Button disabled={!name.trim() || saved.save.isPending} onClick={async () => { if (!analysis) return; try { await saved.save.mutateAsync({name, config: {query: "", filters: {snapshot: JSON.stringify({...analysis, costs})}}}); setSaveOpen(false); } catch {} }}>Save</Button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={saveOpen} onOpenChange={setSaveOpen}><DialogContent><DialogHeader><DialogTitle>Save logistics analysis</DialogTitle></DialogHeader><Label htmlFor="analysis-name">Analysis name</Label><Input id="analysis-name" value={name} onChange={e => setName(e.target.value)} maxLength={100} /><p className="text-xs text-muted-foreground">Saved privately to your account. Reusing a name replaces its previous analysis.</p><DialogFooter><Button variant="outline" onClick={() => setSaveOpen(false)}>Cancel</Button><Button disabled={!name.trim() || saved.save.isPending} onClick={async () => { if (!analysis) return; try { await saved.save.mutateAsync({name, config: {query: "", filters: {snapshot: JSON.stringify(analysis)}}}); setSaveOpen(false); } catch {} }}>Save</Button></DialogFooter></DialogContent></Dialog>
     <Dialog open={!!deleteId} onOpenChange={open => { if (!open) setDeleteId(null); }}><DialogContent><DialogHeader><DialogTitle>Delete saved analysis?</DialogTitle></DialogHeader><p className="text-sm text-muted-foreground">This removes only this saved analysis, not any coordinates or other records.</p><DialogFooter><Button variant="outline" onClick={() => setDeleteId(null)}>Cancel</Button><Button variant="destructive" disabled={saved.remove.isPending} onClick={async () => { if (!deleteId) return; try { await saved.remove.mutateAsync(deleteId); setDeleteId(null); } catch {} }}>Delete</Button></DialogFooter></DialogContent></Dialog>
   </div>;
 }
