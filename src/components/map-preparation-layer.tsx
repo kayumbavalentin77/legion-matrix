@@ -53,7 +53,7 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
   useEffect(() => {
     selection.current?.remove(); selection.current=null;
     if(boundary.length < 3) return;
-    const polygon=L.polygon(boundary.map(p=>[p.lat,p.lng]),{color:getComputedStyle(document.documentElement).getPropertyValue("--primary").trim(),fillOpacity:0.06}).addTo(map);
+    const polygon=L.polygon(boundary.map(p=>[p.lat,p.lng] as [number,number]),{color:getComputedStyle(document.documentElement).getPropertyValue("--primary").trim(),fillOpacity:0.06}).addTo(map);
     selection.current=polygon;
     if(editing) polygon.pm.enable({allowSelfIntersection:false});
     const update=()=>callback.current((polygon.getLatLngs()[0] as L.LatLng[]).map(p=>({lat:p.lat,lng:p.lng})));
