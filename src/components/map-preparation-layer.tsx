@@ -8,11 +8,6 @@ import type { MapBounds, MapOverlay, MapPoint } from "@/lib/map-preparation";
 export type MapTools = { bounds: () => MapBounds; zoomArea: (points: MapPoint[]) => void; capture: () => Promise<{url: string; scale: number; bounds: MapBounds}> };
 export default function MapPreparationLayer({ boundary, tool, editing, overlay, imageUrl, grid, layer, onBoundary, onTools }: {boundary: MapPoint[]; tool: string; editing: boolean; overlay: MapOverlay | null; imageUrl: string; grid: boolean; layer: string; onBoundary: (points: MapPoint[]) => void; onTools: (tools: MapTools) => void}) {
   const map = useMap();
-  useEffect(() => {
-    const old=L.GridLayer.prototype.getPane;
-    L.GridLayer.prototype.getPane=function(name?:string){console.log("PANE DEBUG",this.options.pane,name,Object.keys(map.getPanes()));return old.call(this,name);};
-    return()=>{L.GridLayer.prototype.getPane=old;};
-  },[map]);
   const selection = useRef<L.Polygon | null>(null);
   const callback = useRef(onBoundary); callback.current = onBoundary;
   useEffect(() => {
