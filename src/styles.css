@@ -151,3 +151,5 @@
 }
 
 .leaflet-container { height: 100%; width: 100%; border-radius: var(--radius); z-index: 0; }
+
+.map-grid-label { color: var(--foreground); background: var(--card); font-size: 10px; padding: 1px 3px; border: 1px solid var(--border); white-space: nowrap; }
