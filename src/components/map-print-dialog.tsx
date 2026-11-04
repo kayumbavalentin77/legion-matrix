@@ -22,7 +22,7 @@ export function MapPrintDialog({ capture, sheet, onClose }: {capture: MapCapture
       const actualWidth=Math.min(imageWidth,imageHeight*image.width/image.height);
       pdf.addImage(capture.url,"PNG",12,32,actualWidth,imageHeight);
       const y=32+imageHeight+8;
-      const denominator=Math.round(capture.scale*image.width/(actualWidth/1000)/100)*100;
+      const denominator=Math.round(capture.scale*(image.width/2)/(actualWidth/1000)/100)*100;
       pdf.setFontSize(10);pdf.text(`Scale approximately 1:${denominator.toLocaleString()} at ${sheet.paper.toUpperCase()} (${sheet.orientation})`,12,y);
       pdf.text("N",width-20,18);pdf.line(width-19,21,width-19,29);pdf.line(width-19,21,width-21,24);pdf.line(width-19,21,width-17,24);
       const [[south,west],[north,east]]=capture.bounds;

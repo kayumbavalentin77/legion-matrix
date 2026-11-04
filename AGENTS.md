@@ -15,3 +15,4 @@
 - Super Admin accounts cannot be modified through the management UI; only Super Admins can grant or manage the Administrator role.
 - LCPP reuses MissionMap through its optional map-layer children; public OSRM road alternatives and configurable logistics estimates remain isolated in a browser-safe service, preserving Mission Map behavior.
 - LCPP snapshots use the existing per-user search_presets JSON config under the lcpp module, preserving existing storage permissions and avoiding duplicate tables.
+- LCPP map preparation uses a single lazy map wrapper to load Leaflet drawing layers together; uploaded rendered images live in private owner-scoped Storage, and map placements use existing per-user presets.
