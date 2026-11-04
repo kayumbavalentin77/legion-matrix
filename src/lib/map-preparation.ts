@@ -22,7 +22,7 @@ export async function readMapImage(file: File): Promise<{ blob: Blob; bounds: Ma
     const image = await tiff.getImage();
     if (image.getSamplesPerPixel() < 3) throw new Error("This single-band TIFF requires GIS preprocessing. Upload a rendered RGB GeoTIFF or PNG.");
     const width = Math.min(image.getWidth(), 2048);
-    const height = Math.max(1, Math.round(image.getHeight() * width / image.getWidth()));
+    const height = Math.min(2048, Math.max(1, Math.round(image.getHeight() * width / image.getWidth())));
     const rgb = await image.readRGB({ width, height, interleave: true });
     const canvas = document.createElement("canvas"); canvas.width = width; canvas.height = height;
     const context = canvas.getContext("2d"); if (!context) throw new Error("Image preview is unavailable.");

@@ -22,13 +22,16 @@ export function MapPrintDialog({ capture, sheet, onClose }: {capture: MapCapture
       const actualWidth=Math.min(imageWidth,imageHeight*image.width/image.height);
       pdf.addImage(capture.url,"PNG",12,32,actualWidth,imageHeight);
       const y=32+imageHeight+8;
-      const denominator=Math.round(capture.scale*image.width/(actualWidth/1000)/100)*100;
+      const denominator=Math.round(capture.scale*(image.width/2)/(actualWidth/1000)/100)*100;
       pdf.setFontSize(10);pdf.text(`Scale approximately 1:${denominator.toLocaleString()} at ${sheet.paper.toUpperCase()} (${sheet.orientation})`,12,y);
       pdf.text("N",width-20,18);pdf.line(width-19,21,width-19,29);pdf.line(width-19,21,width-21,24);pdf.line(width-19,21,width-17,24);
       const [[south,west],[north,east]]=capture.bounds;
-      pdf.setFontSize(8);pdf.text(`Bounds: ${south.toFixed(5)}°, ${west.toFixed(5)}° — ${north.toFixed(5)}°, ${east.toFixed(5)}°`,12,y+7);
-      pdf.text("Legend: green boundary = selected area; grid = WGS84 latitude / longitude.",12,y+14);
-      if(sheet.overlay) pdf.text(`Image: ${sheet.overlay.name} · ${sheet.overlay.georeferenced ? "Georeferenced" : "Unreferenced / manually positioned"}`,12,y+21,{maxWidth:width-24});
+      const scaleKm=denominator*0.05/1000;
+      pdf.line(12,y+4,62,y+4);pdf.line(12,y+2,12,y+6);pdf.line(62,y+2,62,y+6);
+      pdf.setFontSize(8);pdf.text(`${scaleKm.toFixed(2)} km`,66,y+5);
+      pdf.setFontSize(8);pdf.text(`Bounds: ${south.toFixed(5)}°, ${west.toFixed(5)}° — ${north.toFixed(5)}°, ${east.toFixed(5)}°`,12,y+12);
+      pdf.text("Legend: green boundary = selected area; grid = WGS84 latitude / longitude.",12,y+19);
+      if(sheet.overlay) pdf.text(`Image: ${sheet.overlay.name} · ${sheet.overlay.georeferenced ? "Georeferenced" : "Unreferenced / manually positioned"}`,12,y+26,{maxWidth:width-24});
       pdf.text("Terrain / contours are provider data where available; this is not a surveyed or certified map.",12,height-19);
       pdf.text(`Prepared ${new Date().toLocaleString()} · OSM contributors · OpenTopoMap CC-BY-SA / SRTM or Esri as shown`,12,height-12,{maxWidth:width-24});
       if(print) {

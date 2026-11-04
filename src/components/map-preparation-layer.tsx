@@ -10,6 +10,7 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
   const map = useMap();
   const selection = useRef<L.Polygon | null>(null);
   const callback = useRef(onBoundary); callback.current = onBoundary;
+  const boundaryRef=useRef(boundary);boundaryRef.current=boundary;
   useEffect(() => {
     const scale = L.control.scale({ imperial: false }).addTo(map);
     onTools({
@@ -19,10 +20,32 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
         const container = map.getContainer();
         await new Promise(resolve => setTimeout(resolve, 650));
         const {toPng} = await import("html-to-image");
-        const url = await toPng(container, {pixelRatio:2, filter: node => !(node instanceof HTMLElement && (node.classList.contains("leaflet-control-zoom") || node.classList.contains("marker-icon") || node.classList.contains("leaflet-pm-toolbar")))});
+        let url = await toPng(container, {pixelRatio:2, filter: node => !(node instanceof HTMLElement && (node.classList.contains("leaflet-control-zoom") || node.classList.contains("marker-icon") || node.classList.contains("leaflet-pm-toolbar")))});
         const b=map.getBounds(); const size=map.getSize();
+        const selected=boundaryRef.current;
+        let outputBounds:MapBounds=[[b.getSouth(),b.getWest()],[b.getNorth(),b.getEast()]];
+        if(selected.length>=3) {
+          const vertices=selected.map(p=>map.latLngToContainerPoint([p.lat,p.lng]));
+          const left=Math.max(0,Math.floor(Math.min(...vertices.map(p=>p.x))));
+          const top=Math.max(0,Math.floor(Math.min(...vertices.map(p=>p.y))));
+          const right=Math.min(size.x,Math.ceil(Math.max(...vertices.map(p=>p.x))));
+          const bottom=Math.min(size.y,Math.ceil(Math.max(...vertices.map(p=>p.y))));
+          if(right>left && bottom>top) {
+            const image=new Image();image.src=url;await image.decode();
+            const canvas=document.createElement("canvas");canvas.width=(right-left)*2;canvas.height=(bottom-top)*2;
+            const context=canvas.getContext("2d");
+            if(context) {
+              context.drawImage(image,left*2,top*2,canvas.width,canvas.height,0,0,canvas.width,canvas.height);
+              context.globalCompositeOperation="destination-in";context.beginPath();
+              vertices.forEach((p,index)=>{if(index===0)context.moveTo((p.x-left)*2,(p.y-top)*2);else context.lineTo((p.x-left)*2,(p.y-top)*2);});
+              context.closePath();context.fill();url=canvas.toDataURL("image/png");
+              const sw=map.containerPointToLatLng([left,bottom]),ne=map.containerPointToLatLng([right,top]);
+              outputBounds=[[sw.lat,sw.lng],[ne.lat,ne.lng]];
+            }
+          }
+        }
         const metres=map.distance(map.containerPointToLatLng([0,size.y/2]),map.containerPointToLatLng([size.x,size.y/2]));
-        return {url,scale:metres/size.x,bounds:[[b.getSouth(),b.getWest()],[b.getNorth(),b.getEast()]]};
+        return {url,scale:metres/size.x,bounds:outputBounds};
       },
     });
     return () => { scale.remove(); };
@@ -63,7 +86,7 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
   useEffect(()=>{
     if(!overlay || !imageUrl) return;
     const image=L.imageOverlay(imageUrl,overlay.bounds,{opacity:overlay.opacity,interactive:false,crossOrigin:"anonymous",pmIgnore:true}).addTo(map);
-    const rotate=()=>{const element=image.getElement();if(element) {element.style.transform+=` rotate(${overlay.rotation}deg)`;element.style.transformOrigin="center";}};
+    const rotate=()=>{const element=image.getElement();if(element) {element.style.transform=element.style.transform.replace(/ rotate\([^)]*\)/g,"")+` rotate(${overlay.rotation}deg)`;element.style.transformOrigin="center";}};
     image.on("load",rotate);map.on("zoomend moveend",rotate);
     return()=>{image.remove();map.off("zoomend moveend",rotate);};
   },[map,overlay,imageUrl]);
