@@ -17,6 +17,7 @@ import { fetchRoadRoutes, rankRoutes, ROUTING_SOURCE, type LogisticsAnalysis, ty
 
 const LcppMap = lazy(() => import("@/components/lcpp-map"));
 import { MapPreparationPanel } from "@/components/map-preparation-panel";
+import { LandCoverAnalysis } from "@/components/land-cover-analysis";
 import type { MapTools } from "@/components/map-preparation-layer";
 import type { MapPoint, MapSheet } from "@/lib/map-preparation";
 
@@ -142,6 +143,7 @@ function LcppPage() {
       </Suspense>
     </CardContent></Card>
     <MapPreparationPanel sheet={sheet} onSheet={setSheet} tools={mapTools} editing={editingBoundary} onEditing={setEditingBoundary} imageUrl={imageUrl} onImageUrl={setImageUrl}/>
+    <LandCoverAnalysis/>
     <div>
       <Card><CardHeader><CardTitle className="text-base">Logistics route</CardTitle></CardHeader><CardContent className="space-y-3">
         <div className="grid gap-2 sm:grid-cols-2 no-print">{(["origin", "destination"] as const).map(target => <Select key={target} value={coordinates.find(c => c.latitude === (target === "origin" ? origin : destination)?.lat && c.longitude === (target === "origin" ? origin : destination)?.lng)?.id ?? ""} onValueChange={id => { const c = coordinates.find(c => c.id === id); if (!c) return; request.current?.abort(); setLoading(false); (target === "origin" ? setOrigin : setDestination)(toPoint(c)); setAnalysis(null); }}><SelectTrigger aria-label={target === "origin" ? "From saved coordinate" : "To saved coordinate"}><SelectValue placeholder={target === "origin" ? "From saved coordinate…" : "To saved coordinate…"} /></SelectTrigger><SelectContent>{coordinates.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select>)}</div>
