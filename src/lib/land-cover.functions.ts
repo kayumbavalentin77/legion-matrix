@@ -22,7 +22,7 @@ export const summarizeLandCover = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => input.parse(d))
   .handler(async ({ data, context }) => {
-    const { data: allowed } = await context.supabase.rpc("has_section", { _section: "s3" } as never);
+    const { data: allowed } = await context.supabase.rpc("has_section", { _section: "s3" });
     if (!allowed) return { ok: false as const, error: "Only GIS administrators can run this analysis." };
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) return { ok: false as const, error: "AI analysis is not configured." };
