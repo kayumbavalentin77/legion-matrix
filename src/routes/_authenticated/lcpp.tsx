@@ -46,7 +46,7 @@ function LcppPage() {
   const [searching, setSearching] = useState(false);
   const [pickTarget, setPickTarget] = useState<"origin" | "destination">("origin");
   const [picking, setPicking] = useState(false);
-  const [satellite, setSatellite] = useState(false);
+
   const [sort, setSort] = useState("distance");
   const [sheet, setSheet] = useState<MapSheet>({title: "LCPP Map", boundary: [], overlay: null, layer: "street", grid: false, paper: "a4", orientation: "landscape"});
   const [drawTool,setDrawTool]=useState("none");
@@ -106,10 +106,10 @@ function LcppPage() {
 
   if (!auth.isLoading && !auth.can(["s3"])) return <PageHeader title="LCPP" description="This module is available in the Operations section." />;
   return <div className="space-y-6 print-area">
-    <PageHeader title="Least-Cost Probable Path (LCPP)" description="General logistics route comparison. Map images, area selection and topographic preparation. Road distances and travel times are estimates." actions={<div className="flex flex-wrap gap-2">
+    <div className="lcpp-page-header"><PageHeader title="Least-Cost Probable Path (LCPP)" description="General logistics route comparison. Map images, area selection and topographic preparation. Road distances and travel times are estimates." actions={<div className="flex flex-wrap gap-2">
       <Button size="sm" variant="outline" disabled={!analysis} onClick={() => window.print()}><Printer className="mr-2 h-4 w-4" />Print report</Button>
       <Button size="sm" disabled={!analysis} onClick={() => { setName(""); setSaveOpen(true); }}><Save className="mr-2 h-4 w-4" />Save analysis</Button>
-    </div>} />
+    </div>} /></div>
     <Card><CardContent className="space-y-3 p-4">
       <div className="flex flex-col gap-2 md:flex-row md:items-center no-print">
         <div className="relative min-w-0 flex-1">
