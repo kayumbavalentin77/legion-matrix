@@ -18,8 +18,8 @@ export function LandCoverAnalysis() {
 
   async function analyze(file?: File) {
     if (!file) return;
-    if (!TYPES.includes(file.type as never)) return toast.error("Upload a JPG, PNG or WebP image.");
-    if (file.size > 8 * 1024 * 1024) return toast.error("Image must be 8 MB or smaller.");
+    if (!TYPES.includes(file.type as never)) { toast.error("Upload a JPG, PNG or WebP image."); return; }
+    if (file.size > 8 * 1024 * 1024) { toast.error("Image must be 8 MB or smaller."); return; }
     const dataUrl = await new Promise<string>((ok, bad) => {
       const r = new FileReader(); r.onload = () => ok(String(r.result)); r.onerror = bad; r.readAsDataURL(file);
     });
