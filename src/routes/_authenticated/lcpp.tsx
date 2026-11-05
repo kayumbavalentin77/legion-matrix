@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeftRight, Crosshair, Layers, Loader2, Maximize2, Navigation, Printer, Save, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
@@ -15,7 +15,7 @@ import { useAuthState } from "@/lib/auth";
 import { usePresets } from "@/lib/presets";
 import { fetchRoadRoutes, rankRoutes, ROUTING_SOURCE, type LogisticsAnalysis, type RoutePoint } from "@/lib/lcpp";
 
-const LcppMap = lazy(() => import("@/components/lcpp-map"));
+import LcppMap from "@/components/lcpp-map";
 import { MapPreparationPanel } from "@/components/map-preparation-panel";
 import { LandCoverAnalysis } from "@/components/land-cover-analysis";
 import type { MapTools } from "@/components/map-preparation-layer";
@@ -138,9 +138,7 @@ function LcppPage() {
         <span className="min-w-0 flex-1 break-words"><strong>From:</strong> {origin?.name ?? "Not selected"} <span className="mx-2">→</span> <strong>To:</strong> {destination?.name ?? "Not selected"}</span>
         <Select value={pickTarget} onValueChange={value => setPickTarget(value === "origin" ? "origin" : "destination")}><SelectTrigger aria-label="Location target" className="w-40 no-print"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="origin">Set origin</SelectItem><SelectItem value="destination">Set destination</SelectItem></SelectContent></Select>
       </div>
-      <Suspense fallback={<div className="grid h-[560px] place-items-center text-sm text-muted-foreground">Loading map…</div>}>
-        <LcppMap map={{points,measurePath:[],picking,measuring:false,focus,fitSignal,satellite:sheet.layer === "satellite",selectedId:null,onPick:point=>choose({...point,name:`${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`}),onMeasure:()=>{},onSelect:c=>setFocus({lat:c.latitude,lng:c.longitude,signal:Date.now()})}} preparation={{boundary:sheet.boundary,tool:drawTool,editing:editingBoundary,overlay:sheet.overlay,imageUrl,grid:sheet.grid,layer:sheet.layer,onBoundary,onTools}} routes={{routes:analysis?.routes??[],selectedId,fitSignal,onSelect:setSelectedId}}/>
-      </Suspense>
+      <LcppMap map={{points,measurePath:[],picking,measuring:false,focus,fitSignal,satellite:sheet.layer === "satellite",selectedId:null,onPick:point=>choose({...point,name:`${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`}),onMeasure:()=>{},onSelect:c=>setFocus({lat:c.latitude,lng:c.longitude,signal:Date.now()})}} preparation={{boundary:sheet.boundary,tool:drawTool,editing:editingBoundary,overlay:sheet.overlay,imageUrl,grid:sheet.grid,layer:sheet.layer,onBoundary,onTools}} routes={{routes:analysis?.routes??[],selectedId,fitSignal,onSelect:setSelectedId}}/>
     </CardContent></Card>
     <MapPreparationPanel sheet={sheet} onSheet={setSheet} tools={mapTools} editing={editingBoundary} onEditing={setEditingBoundary} imageUrl={imageUrl} onImageUrl={setImageUrl}/>
     <LandCoverAnalysis/>
