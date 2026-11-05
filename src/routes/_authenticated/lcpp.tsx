@@ -17,6 +17,7 @@ import { fetchRoadRoutes, rankRoutes, ROUTING_SOURCE, type LogisticsAnalysis, ty
 
 import LcppMap from "@/components/lcpp-map";
 import { MapPreparationPanel } from "@/components/map-preparation-panel";
+import { MapAreaTools } from "@/components/map-area-tools";
 import { LandCoverAnalysis } from "@/components/land-cover-analysis";
 import type { MapTools } from "@/components/map-preparation-layer";
 import type { MapPoint, MapSheet } from "@/lib/map-preparation";
@@ -141,6 +142,7 @@ function LcppPage() {
       <LcppMap map={{points,measurePath:[],picking,measuring:false,focus,fitSignal,satellite:sheet.layer === "satellite",selectedId:null,onPick:point=>choose({...point,name:`${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`}),onMeasure:()=>{},onSelect:c=>setFocus({lat:c.latitude,lng:c.longitude,signal:Date.now()})}} preparation={{boundary:sheet.boundary,tool:drawTool,editing:editingBoundary,overlay:sheet.overlay,imageUrl,grid:sheet.grid,layer:sheet.layer,onBoundary,onTools}} routes={{routes:analysis?.routes??[],selectedId,fitSignal,onSelect:setSelectedId}}/>
     </CardContent></Card>
     <MapPreparationPanel sheet={sheet} onSheet={setSheet} tools={mapTools} editing={editingBoundary} onEditing={setEditingBoundary} imageUrl={imageUrl} onImageUrl={setImageUrl}/>
+    <MapAreaTools boundary={sheet.boundary} coordinates={coordinates} onBoundary={onBoundary} onZoom={p=>mapTools.current?.zoomArea(p)}/>
     <LandCoverAnalysis/>
     <div>
       <Card><CardHeader><CardTitle className="text-base">Logistics route</CardTitle></CardHeader><CardContent className="space-y-3">
