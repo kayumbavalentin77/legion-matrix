@@ -6,9 +6,11 @@ import { Component, useState, type ComponentProps, type ReactNode } from "react"
 // If Leaflet throws while the map is being torn down/rebuilt, remount a fresh map instead of blanking the page.
 class MapBoundary extends Component<{ onReset: () => void; children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
+  retries = 0;
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: unknown) {
     console.warn("LCPP map recovered from an error", error);
+    if (++this.retries > 3) return; // stop retrying a persistent failure
     setTimeout(() => { this.props.onReset(); this.setState({ failed: false }); }, 0);
   }
   render() {
