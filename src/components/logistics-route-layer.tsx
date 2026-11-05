@@ -4,7 +4,7 @@ import { useMap } from "react-leaflet";
 import type { RoadRoute } from "@/lib/lcpp";
 
 // Imperative Leaflet layers: never add to a map whose panes were removed.
-const mapAlive = (map: L.Map) => Boolean((map as unknown as { _panes?: Record<string, HTMLElement> })._panes?.overlayPane);
+const mapAlive = (map: L.Map) => Boolean((map as unknown as { _panes?: Record<string, HTMLElement> })._panes?.["overlayPane"]);
 
 export default function LogisticsRouteLayer({ routes, selectedId, fitSignal, onSelect }: { routes: RoadRoute[]; selectedId: string; fitSignal: number; onSelect: (id: string) => void }) {
   const map = useMap();
