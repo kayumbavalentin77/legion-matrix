@@ -1,6 +1,7 @@
 import MissionMap from "@/components/mission-map";
 import MapPreparationLayer from "@/components/map-preparation-layer";
 import LogisticsRouteLayer from "@/components/logistics-route-layer";
+import SavedAreasLayer from "@/components/saved-areas-layer";
 import { Component, useState, type ComponentProps, type ReactNode } from "react";
 
 // If Leaflet throws while the map is being torn down/rebuilt, remount a fresh map instead of blanking the page.
@@ -20,11 +21,11 @@ class MapBoundary extends Component<{ onReset: () => void; children: ReactNode }
   }
 }
 
-export default function LcppMap({map,preparation,routes}: {map:ComponentProps<typeof MissionMap>;preparation:ComponentProps<typeof MapPreparationLayer>;routes:ComponentProps<typeof LogisticsRouteLayer>}) {
+export default function LcppMap({map,preparation,routes,areas}: {areas:ComponentProps<typeof SavedAreasLayer>;map:ComponentProps<typeof MissionMap>;preparation:ComponentProps<typeof MapPreparationLayer>;routes:ComponentProps<typeof LogisticsRouteLayer>}) {
   const [generation, setGeneration] = useState(0);
   return (
     <MapBoundary onReset={() => setGeneration(g => g + 1)}>
-      <MissionMap key={generation} {...map}><MapPreparationLayer {...preparation}/><LogisticsRouteLayer {...routes}/></MissionMap>
+      <MissionMap key={generation} {...map}><MapPreparationLayer {...preparation}/><SavedAreasLayer {...areas}/><LogisticsRouteLayer {...routes}/></MissionMap>
     </MapBoundary>
   );
 }
