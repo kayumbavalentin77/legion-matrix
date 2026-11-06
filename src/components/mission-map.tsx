@@ -1,7 +1,8 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { Marker, Polyline, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { StableMapContainer as MapContainer } from "@/components/stable-map-container";
 
 import { categoryStyle, type Coordinate } from "@/lib/coordinates";
 
