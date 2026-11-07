@@ -10,17 +10,24 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
   const selection = useRef<L.Polygon | null>(null);
   const callback = useRef(onBoundary); callback.current = onBoundary;
   const boundaryRef=useRef(boundary);boundaryRef.current=boundary;
-  // leaflet-geoman touches browser globals at import time, so it must load
-  // only after hydration; never statically (SSR would crash).
+  // leaflet-geoman touches browser globals at import time, so it must never
+  // be bundled into the server build. Load its UMD script from /vendor after
+  // hydration instead; it attaches itself to the global L.
   const [pmReady, setPmReady] = useState(false);
   useEffect(() => {
     let active = true;
-    Promise.all([
-      import("@geoman-io/leaflet-geoman-free"),
-      import("@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css"),
-    ]).then(() => { if (active) setPmReady(true); }).catch(() => {});
+    if (!document.querySelector('link[href="/vendor/leaflet-geoman.css"]')) {
+      const css = document.createElement("link");
+      css.rel = "stylesheet"; css.href = "/vendor/leaflet-geoman.css";
+      document.head.appendChild(css);
+    }
+    if (map.pm) { setPmReady(true); return; }
+    const script = document.createElement("script");
+    script.src = "/vendor/leaflet-geoman.min.js";
+    script.onload = () => { if (active) setPmReady(true); };
+    document.head.appendChild(script);
     return () => { active = false; };
-  }, []);
+  }, [map]);
   useEffect(() => {
     const scale = L.control.scale({ imperial: false }).addTo(map);
     onTools({
