@@ -1,7 +1,6 @@
-import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
-import "@geoman-io/leaflet-geoman-free";
+import type {} from "@geoman-io/leaflet-geoman-free";
 import L from "leaflet";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
 import type { MapBounds, MapOverlay, MapPoint } from "@/lib/map-preparation";
 
@@ -11,6 +10,17 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
   const selection = useRef<L.Polygon | null>(null);
   const callback = useRef(onBoundary); callback.current = onBoundary;
   const boundaryRef=useRef(boundary);boundaryRef.current=boundary;
+  // leaflet-geoman touches browser globals at import time, so it must load
+  // only after hydration; never statically (SSR would crash).
+  const [pmReady, setPmReady] = useState(false);
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      import("@geoman-io/leaflet-geoman-free"),
+      import("@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css"),
+    ]).then(() => { if (active) setPmReady(true); }).catch(() => {});
+    return () => { active = false; };
+  }, []);
   useEffect(() => {
     const scale = L.control.scale({ imperial: false }).addTo(map);
     onTools({
@@ -51,6 +61,7 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
     return () => { scale.remove(); };
   },[map,onTools]);
   useEffect(() => {
+    if (!pmReady) return;
     const created = (event: {layer: L.Layer}) => {
       if (!(event.layer instanceof L.Polygon)) return;
       const points = (event.layer.getLatLngs()[0] as L.LatLng[]).map(p => ({lat:p.lat,lng:p.lng}));
@@ -58,8 +69,9 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
     };
     map.on("pm:create",created);
     return () => { map.off("pm:create",created); };
-  },[map]);
+  },[map,pmReady]);
   useEffect(() => {
+    if (!pmReady) return;
     map.pm.disableDraw();
     if (tool === "rectangle") map.pm.enableDraw("Rectangle",{pathOptions:{color:getComputedStyle(document.documentElement).getPropertyValue("--primary").trim()}});
     if (tool === "polygon") map.pm.enableDraw("Polygon");
@@ -72,17 +84,17 @@ export default function MapPreparationLayer({ boundary, tool, editing, overlay, 
       return()=>{map.off("mousedown",down);map.off("mousemove",move);map.off("mouseup",up);map.dragging.enable();};
     }
     return()=>{map.pm.disableDraw();};
-  },[map,tool]);
+  },[map,tool,pmReady]);
   useEffect(() => {
     selection.current?.remove(); selection.current=null;
     if(boundary.length < 3) return;
     const polygon=L.polygon(boundary.map(p=>[p.lat,p.lng] as [number,number]),{color:getComputedStyle(document.documentElement).getPropertyValue("--primary").trim(),fillOpacity:0.06}).addTo(map);
     selection.current=polygon;
-    if(editing) polygon.pm.enable({allowSelfIntersection:false});
+    if(editing && pmReady) polygon.pm.enable({allowSelfIntersection:false});
     const update=()=>callback.current((polygon.getLatLngs()[0] as L.LatLng[]).map(p=>({lat:p.lat,lng:p.lng})));
     polygon.on("pm:edit",update);
     return()=>{polygon.remove();};
-  },[map,boundary,editing]);
+  },[map,boundary,editing,pmReady]);
   useEffect(()=>{
     if(!overlay || !imageUrl) return;
     const image=L.imageOverlay(imageUrl,overlay.bounds,{opacity:overlay.opacity,interactive:false,crossOrigin:"anonymous",pmIgnore:true}).addTo(map);
